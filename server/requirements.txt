@@ -38,7 +38,6 @@ bcrypt==4.1.2
 firebase-admin==6.4.0
 
 # Email
-python-smtp==0.2.0
 sendgrid==6.11.0
 
 # Background Tasks & Scheduling
