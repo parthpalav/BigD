@@ -1,9 +1,12 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 function App() {
   return (
-    <div>
-      <h1>MERN Hackathon Project 🚀</h1>
-      <p>React + TypeScript is set up.</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<h1>Home</h1>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
