@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
@@ -73,7 +73,11 @@ const ParticleField = () => {
 
 // Navigation Bar Component
 const NavigationBar = ({ showNav, onNavigate, theme }: { showNav: boolean; onNavigate: () => void; theme: Theme }) => {
-  const navLinks = ['Home', 'Map', 'About Us'];
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Map', path: '/map' },
+    { name: 'About', path: '/about' },
+  ];
 
   return (
     <AnimatePresence>
@@ -146,49 +150,44 @@ const NavigationBar = ({ showNav, onNavigate, theme }: { showNav: boolean; onNav
               }}
             >
               {navLinks.map((link, index) => (
-                <motion.li key={link}>
-                  <motion.a
-                    href={link === 'Home' ? '#' : `#${link.toLowerCase().replace(' ', '-')}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (link === 'Home') {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
-                    }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * index, duration: 0.5 }}
-                    whileHover={{
-                      scale: 1.05,
-                      color: '#3b82f6',
-                    }}
-                    style={{
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
-                      letterSpacing: '0.05em',
-                      textDecoration: 'none',
-                      transition: 'all 0.3s ease',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      display: 'inline-block',
-                    }}
-                  >
-                    {link}
-                    {/* Underline animation */}
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileHover={{ width: '100%' }}
-                      transition={{ duration: 0.3 }}
-                      style={{
-                        position: 'absolute',
-                        bottom: -4,
-                        left: 0,
-                        height: '2px',
-                        background: 'linear-gradient(90deg, #0ea5e9, #3b82f6, #6366f1)',
+                <motion.li key={link.name}>
+                  <Link to={link.path}>
+                    <motion.span
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index, duration: 0.5 }}
+                      whileHover={{
+                        scale: 1.05,
+                        color: '#3b82f6',
                       }}
-                    />
-                  </motion.a>
+                      style={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
+                        letterSpacing: '0.05em',
+                        textDecoration: 'none',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        display: 'inline-block',
+                      }}
+                    >
+                      {link.name}
+                      {/* Underline animation */}
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileHover={{ width: '100%' }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                          position: 'absolute',
+                          bottom: -4,
+                          left: 0,
+                          height: '2px',
+                          background: 'linear-gradient(90deg, #0ea5e9, #3b82f6, #6366f1)',
+                        }}
+                      />
+                    </motion.span>
+                  </Link>
                 </motion.li>
               ))}
             </ul>
@@ -451,26 +450,39 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login, loginWithGoogle, user } = useAuth();
+  const navigate = useNavigate();
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
   // Initialize Google Sign-In
   useEffect(() => {
     const initializeGoogle = () => {
-      if (window.google && googleButtonRef.current) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          callback: handleGoogleResponse,
-        });
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+      
+      if (!clientId) {
+        console.error('Google Client ID not found in environment variables');
+        return;
+      }
 
-        window.google.accounts.id.renderButton(
-          googleButtonRef.current,
-          {
-            theme: theme === 'dark' ? 'filled_black' : 'outline',
-            size: 'large',
-            width: googleButtonRef.current.offsetWidth,
-            text: 'signin_with',
-          }
-        );
+      if (window.google && googleButtonRef.current) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleGoogleResponse,
+          });
+
+          window.google.accounts.id.renderButton(
+            googleButtonRef.current,
+            {
+              theme: theme === 'dark' ? 'filled_black' : 'outline',
+              size: 'large',
+              width: googleButtonRef.current.offsetWidth,
+              text: 'signin_with',
+            }
+          );
+        } catch (err) {
+          console.error('Failed to initialize Google Sign-In:', err);
+          setError('Google Sign-In initialization failed');
+        }
       }
     };
 
@@ -482,6 +494,9 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
       }
     }, 100);
 
+    // Clear interval after 10 seconds if Google script doesn't load
+    setTimeout(() => clearInterval(checkGoogle), 10000);
+
     return () => clearInterval(checkGoogle);
   }, [theme]);
 
@@ -490,6 +505,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
       setIsLoading(true);
       setError('');
       await loginWithGoogle(response.credential);
+      navigate('/map');
     } catch (err: any) {
       setError(err.message || 'Google sign-in failed');
       console.error('Google sign-in error:', err);
@@ -505,6 +521,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
 
     try {
       await login(username, password);
+      navigate('/map');
     } catch (err: any) {
       setError(err.message || 'Login failed');
       console.error('Login error:', err);

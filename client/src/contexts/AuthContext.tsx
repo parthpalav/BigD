@@ -25,7 +25,7 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = 'http://localhost:3000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -94,13 +94,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const loginWithGoogle = async (credential: string) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/google`, { credential });
+      console.log('Attempting Google login with credential');
+      console.log('API URL:', API_URL);
+      
+      const response = await axios.post(`${API_URL}/auth/google`, { credential }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000, // 10 second timeout
+      });
+      
+      console.log('Google login response:', response.data);
+      
       const { user: userData, token: authToken } = response.data.data;
       
       localStorage.setItem('token', authToken);
       setToken(authToken);
       setUser(userData);
+      
+      console.log('Google login successful');
     } catch (error) {
+      console.error('Google login error:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Response data:', error.response?.data);
+        console.error('Response status:', error.response?.status);
+        console.error('Request config:', error.config);
+      }
       throw new Error(getErrorMessage(error) || 'Google login failed');
     }
   };
