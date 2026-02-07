@@ -6,6 +6,7 @@ import App from "./App";
 import Login from "./pages/Login";
 import SignupPage from "./pages/Signup";
 import Map from "./pages/Map";
+import MapView from "./pages/MapView";
 import About from "./pages/About";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
@@ -20,6 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/about" element={<About />} />
           <Route path="/" element={<App />} />
           <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />
+          <Route path="/mapview" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
