@@ -7,6 +7,7 @@ import MapContainer from '../components/map/MapContainer';
 import InputPanel from '../components/map/InputPanel';
 import InsightsPanel from '../components/map/InsightsPanel';
 import TrafficTimeline from '../components/map/TrafficTimeline';
+import SearchHistory from '../components/map/SearchHistory';
 import type {
     Location,
     TrafficPrediction,
@@ -16,6 +17,8 @@ import {
     predictTraffic,
     getRouteAtTime,
 } from '../services/predictionService';
+import { saveSearch } from '../services/searchHistoryService';
+import type { SearchHistoryItem } from '../services/searchHistoryService';
 
 type Theme = 'light' | 'dark';
 
@@ -31,6 +34,7 @@ const MapView: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [currentHour, setCurrentHour] = useState(new Date().getHours());
     const [selectedRouteType, setSelectedRouteType] = useState<'best' | 'fuel-efficient'>('best');
+    const [showHistory, setShowHistory] = useState(true);
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -62,6 +66,17 @@ const MapView: React.FC = () => {
             setPrediction(result);
             setCurrentRoute(result.bestRoute);
             setCurrentHour(data.departureTime.getHours());
+
+            // Auto-save search to history
+            if (user?.id) {
+                saveSearch(
+                    user.id,
+                    data.source,
+                    data.destination,
+                    data.departureTime,
+                    data.dateRange
+                );
+            }
         } catch (error) {
             console.error('Prediction failed:', error);
             alert('Failed to generate traffic prediction. Please try again.');
@@ -98,6 +113,32 @@ const MapView: React.FC = () => {
         }
     };
 
+    const handleHistoryItemClick = async (item: SearchHistoryItem) => {
+        // Reload route from history
+        setIsLoading(true);
+        setSourceLocation(item.source.coordinates);
+        setDestinationLocation(item.destination.coordinates);
+
+        try {
+            const result = await predictTraffic(
+                item.source,
+                item.destination,
+                item.departureTime,
+                item.dateRange
+            );
+
+            setPrediction(result);
+            setCurrentRoute(result.bestRoute);
+            setCurrentHour(item.departureTime.getHours());
+            setSelectedRouteType('best');
+        } catch (error) {
+            console.error('Failed to reload route:', error);
+            alert('Failed to reload route. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div
             style={{
@@ -124,6 +165,16 @@ const MapView: React.FC = () => {
                 isLoading={isLoading}
                 theme={theme}
             />
+
+            {/* Search History */}
+            {user?.id && (
+                <SearchHistory
+                    userId={user.id}
+                    onSelectSearch={handleHistoryItemClick}
+                    theme={theme}
+                    isVisible={showHistory}
+                />
+            )}
 
             {/* Insights Panel */}
             {prediction && (
@@ -205,6 +256,38 @@ const MapView: React.FC = () => {
                     </motion.button>
                 </motion.div>
             )}
+
+            {/* History Toggle */}
+            <motion.button
+                onClick={() => setShowHistory(!showHistory)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                    position: 'fixed',
+                    top: '2rem',
+                    right: '470px',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
+                    background: showHistory
+                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                        : 'rgba(100, 100, 100, 0.5)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    zIndex: 100,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: showHistory
+                        ? '0 0 20px rgba(16, 185, 129, 0.4)'
+                        : 'none',
+                    transition: 'all 0.3s ease',
+                }}
+            >
+                <span style={{ fontSize: '1.5rem' }}>
+                    {showHistory ? '🕒' : '📋'}
+                </span>
+            </motion.button>
 
             {/* Theme Toggle */}
             <motion.button
