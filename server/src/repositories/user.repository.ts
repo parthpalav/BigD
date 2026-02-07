@@ -53,10 +53,10 @@ export class UserRepository {
           id, 
           email: data.email, 
           passwordHash, 
-          fullName: data.fullName, 
-          phoneNumber: data.phoneNumber,
-          googleId: data.googleId,
-          profilePicture: data.profilePicture,
+          fullName: data.fullName || null, 
+          phoneNumber: data.phoneNumber || null,
+          googleId: data.googleId || null,
+          profilePicture: data.profilePicture || null,
           now: now.toISOString() 
         }
       );

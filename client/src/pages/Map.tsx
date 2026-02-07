@@ -4,17 +4,14 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../hooks/useTheme';
 
 type Theme = 'light' | 'dark';
 
 const Map: React.FC = () => {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const { theme, toggleTheme } = useTheme(); // Use theme from context
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
 
   const handleLogout = () => {
     logout();

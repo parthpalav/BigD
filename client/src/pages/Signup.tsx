@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import Lenis from 'lenis';
+import { useTheme } from '../hooks/useTheme';
 
 // Theme type
 type Theme = 'light' | 'dark';
@@ -55,7 +56,7 @@ const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => 
 };
 
 const SignupPage = () => {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const { theme, toggleTheme } = useTheme(); // Use theme from context
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -66,23 +67,6 @@ const SignupPage = () => {
     password: '',
     confirmPassword: '',
   });
-
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      return newTheme;
-    });
-  };
-
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
 
   useEffect(() => {
     // Initialize smooth scrolling

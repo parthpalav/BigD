@@ -109,13 +109,28 @@ class Server {
         logger.warn('⚠️  Redis unavailable - running without cache');
       }
 
-      // Start server
+      // Start server  
       const PORT = config.port;
-      this.app.listen(PORT, () => {
-        logger.info(`🚀 Server running on port ${PORT}`);
-        logger.info(`📝 Environment: ${config.nodeEnv}`);
-        logger.info(`🌐 API: http://localhost:${PORT}/api/v1`);
+      
+      // Detach from stdin to prevent EIO errors
+      if (process.stdin.isTTY) {
+        process.stdin.pause();
+      }
+      
+      const httpServer = this.app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`📝 Environment: ${config.nodeEnv}`);
+        console.log(`🌐 API: http://localhost:${PORT}/api/v1`);
       });
+      
+      httpServer.on('error', (error: any) => {
+        console.error('Server error:', error);
+        process.exit(1);
+      });
+
+      // Keep process alive
+      await new Promise(() => {});
+      await new Promise(() => {});
     } catch (error) {
       logger.error('❌ Failed to start server:', error);
       process.exit(1);

@@ -1,33 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
 import { Link } from 'react-router-dom';
-
-type Theme = 'light' | 'dark';
+import { useTheme } from '../hooks/useTheme';
+import { CityScene } from '../components/about/CityScene';
+import { TrafficFlow } from '../components/about/TrafficFlow';
+import { SceneController } from '../components/about/SceneController';
+import { ScrollSections } from '../components/about/ScrollSections';
 
 const About: React.FC = () => {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const { theme, toggleTheme } = useTheme();
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [focusMode, setFocusMode] = useState<'commercial' | 'private' | 'intelligence' | 'default'>('default');
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = Math.min(window.scrollY / scrollHeight, 1);
+      setScrollProgress(progress);
+
+      // Update focus mode based on scroll progress
+      if (progress < 0.2) {
+        setFocusMode('default');
+      } else if (progress < 0.4) {
+        setFocusMode('commercial');
+      } else if (progress < 0.6) {
+        setFocusMode('private');
+      } else if (progress < 0.8) {
+        setFocusMode('intelligence');
+      } else {
+        setFocusMode('default');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div
       style={{
-        minHeight: '100vh',
+        minHeight: '500vh',
         background: theme === 'dark' ? '#000' : '#fff',
         transition: 'background 0.5s ease',
         position: 'relative',
-        overflow: 'hidden',
       }}
     >
-      {/* Background 3D Stars */}
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <Canvas>
-          <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-          <OrbitControls enableZoom={false} enablePan={false} />
+      {/* Fixed 3D Scene */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100vh',
+          zIndex: 0,
+        }}
+      >
+        <Canvas
+          camera={{ position: [0, 25, 25], fov: 50 }}
+          style={{
+            background: theme === 'dark'
+              ? 'radial-gradient(circle at center, #0a0a0a 0%, #000 100%)'
+              : 'radial-gradient(circle at center, #f0f0f0 0%, #e0e0e0 100%)',
+          }}
+        >
+          <ambientLight intensity={0.3} />
+          <directionalLight position={[10, 10, 5]} intensity={0.5} />
+          <CityScene scrollProgress={scrollProgress} focusMode={focusMode} />
+          <TrafficFlow intensity={0.3 + scrollProgress * 0.7} focusMode={focusMode} />
+          <SceneController scrollProgress={scrollProgress} focusMode={focusMode} />
         </Canvas>
       </div>
 
@@ -74,7 +116,9 @@ const About: React.FC = () => {
             left: '2rem',
             padding: '0.75rem 1.5rem',
             borderRadius: '0.5rem',
-            background: 'rgba(59, 130, 246, 0.8)',
+            background: theme === 'dark'
+              ? 'rgba(59, 130, 246, 0.8)'
+              : 'rgba(59, 130, 246, 0.9)',
             color: 'white',
             border: 'none',
             cursor: 'pointer',
@@ -87,248 +131,59 @@ const About: React.FC = () => {
         </motion.button>
       </Link>
 
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 10, padding: '2rem' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+      {/* Scroll Sections Overlay */}
+      <div style={{ position: 'relative', zIndex: 10 }}>
+        <ScrollSections theme={theme} />
+      </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: scrollProgress < 0.1 ? 1 : 0 }}
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <span
           style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            paddingTop: '6rem',
+            color: theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+            fontSize: '0.875rem',
+            fontWeight: 500,
           }}
         >
-          {/* Header */}
-          <motion.h1
-            style={{
-              fontSize: 'clamp(3rem, 8vw, 6rem)',
-              fontWeight: 900,
-              letterSpacing: '-0.04em',
-              marginBottom: '1rem',
-              background: 'linear-gradient(135deg, #ffffff 0%, #3b82f6 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textAlign: 'center',
-            }}
-          >
-            About ORION
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            style={{
-              textAlign: 'center',
-              fontSize: '1.5rem',
-              color: theme === 'dark' ? '#a0a0a0' : '#666',
-              marginBottom: '3rem',
-              fontWeight: 300,
-              letterSpacing: '0.05em',
-            }}
-          >
-            From Forecasts to Flow
-          </motion.p>
-
-          {/* Mission Statement */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-            style={{
-              background: theme === 'dark'
-                ? 'rgba(20, 20, 20, 0.6)'
-                : 'rgba(255, 255, 255, 0.6)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: theme === 'dark'
-                ? '1px solid rgba(255, 255, 255, 0.1)'
-                : '1px solid rgba(0, 0, 0, 0.1)',
-              borderRadius: '1.5rem',
-              padding: '3rem',
-              marginBottom: '3rem',
-              boxShadow: theme === 'dark'
-                ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                : '0 8px 32px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: '2.5rem',
-                fontWeight: 700,
-                color: theme === 'dark' ? 'white' : '#1a1a1a',
-                marginBottom: '1.5rem',
-                textAlign: 'center',
-              }}
-            >
-              Our Mission
-            </h2>
-            <p
-              style={{
-                fontSize: '1.2rem',
-                color: theme === 'dark' ? '#a0a0a0' : '#666',
-                lineHeight: '1.8',
-                textAlign: 'center',
-                maxWidth: '800px',
-                margin: '0 auto',
-              }}
-            >
-              ORION is a cutting-edge platform designed to transform data into actionable insights.
-              We combine advanced analytics, real-time visualization, and intuitive design to help
-              you make informed decisions faster than ever before.
-            </p>
-          </motion.div>
-
-          {/* Features Grid */}
+          Scroll to explore
+        </span>
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          style={{
+            width: '24px',
+            height: '36px',
+            border: theme === 'dark' ? '2px solid rgba(255, 255, 255, 0.4)' : '2px solid rgba(0, 0, 0, 0.4)',
+            borderRadius: '12px',
+            display: 'flex',
+            justifyContent: 'center',
+            paddingTop: '6px',
+          }}
+        >
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '2rem',
-              marginBottom: '3rem',
+              width: '4px',
+              height: '8px',
+              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+              borderRadius: '2px',
             }}
-          >
-            {[
-              {
-                icon: '🚀',
-                title: 'Fast & Efficient',
-                desc: 'Lightning-fast data processing and visualization with optimized performance.',
-              },
-              {
-                icon: '🔒',
-                title: 'Secure & Private',
-                desc: 'Enterprise-grade security with end-to-end encryption and privacy controls.',
-              },
-              {
-                icon: '📊',
-                title: 'Data-Driven',
-                desc: 'Make informed decisions with real-time analytics and comprehensive insights.',
-              },
-              {
-                icon: '🌐',
-                title: 'Global Scale',
-                desc: 'Built to handle massive datasets across multiple geographic regions.',
-              },
-              {
-                icon: '🤖',
-                title: 'AI-Powered',
-                desc: 'Leveraging machine learning for predictive analytics and smart recommendations.',
-              },
-              {
-                icon: '🎨',
-                title: 'Beautiful Design',
-                desc: 'Intuitive interface with stunning visualizations that make data come alive.',
-              },
-            ].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + idx * 0.1 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                style={{
-                  background: theme === 'dark'
-                    ? 'rgba(20, 20, 20, 0.6)'
-                    : 'rgba(255, 255, 255, 0.6)',
-                  backdropFilter: 'blur(20px)',
-                  border: theme === 'dark'
-                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                    : '1px solid rgba(0, 0, 0, 0.1)',
-                  borderRadius: '1rem',
-                  padding: '2rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{feature.icon}</div>
-                <h3
-                  style={{
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    color: theme === 'dark' ? 'white' : '#1a1a1a',
-                    marginBottom: '0.75rem',
-                  }}
-                >
-                  {feature.title}
-                </h3>
-                <p
-                  style={{
-                    fontSize: '1rem',
-                    color: theme === 'dark' ? '#a0a0a0' : '#666',
-                    lineHeight: '1.6',
-                  }}
-                >
-                  {feature.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Team Section */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-            style={{
-              background: theme === 'dark'
-                ? 'rgba(20, 20, 20, 0.6)'
-                : 'rgba(255, 255, 255, 0.6)',
-              backdropFilter: 'blur(20px)',
-              border: theme === 'dark'
-                ? '1px solid rgba(255, 255, 255, 0.1)'
-                : '1px solid rgba(0, 0, 0, 0.1)',
-              borderRadius: '1.5rem',
-              padding: '3rem',
-              textAlign: 'center',
-              boxShadow: theme === 'dark'
-                ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                : '0 8px 32px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: '2.5rem',
-                fontWeight: 700,
-                color: theme === 'dark' ? 'white' : '#1a1a1a',
-                marginBottom: '1rem',
-              }}
-            >
-              Join Us
-            </h2>
-            <p
-              style={{
-                fontSize: '1.2rem',
-                color: theme === 'dark' ? '#a0a0a0' : '#666',
-                marginBottom: '2rem',
-                maxWidth: '600px',
-                margin: '0 auto 2rem',
-              }}
-            >
-              We're always looking for talented individuals to join our team.
-              If you're passionate about data and innovation, we'd love to hear from you.
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{
-                padding: '1rem 2rem',
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                cursor: 'pointer',
-                boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)',
-              }}
-            >
-              Contact Us
-            </motion.button>
-          </motion.div>
+          />
         </motion.div>
-      </div>
+      </motion.div>
     </div>
   );
 };

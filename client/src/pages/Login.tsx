@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../hooks/useTheme';
 
 interface GoogleCallbackResponse {
   credential: string;
 }
 
 const Login: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -90,6 +92,38 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-black p-4">
+      {/* Theme Toggle Button */}
+      <motion.button
+        onClick={toggleTheme}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        style={{
+          position: 'fixed',
+          top: '2rem',
+          right: '2rem',
+          width: '50px',
+          height: '50px',
+          borderRadius: '50%',
+          background: theme === 'dark' 
+            ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
+            : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
+          border: 'none',
+          cursor: 'pointer',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: theme === 'dark' 
+            ? '0 0 20px rgba(59, 130, 246, 0.4)'
+            : '0 0 20px rgba(251, 191, 36, 0.4)',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        <span style={{ fontSize: '1.5rem' }}>
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </span>
+      </motion.button>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
