@@ -1,7 +1,5 @@
 // Map-related utility functions for ORION Traffic Intelligence Platform
 
-import mapboxgl from 'mapbox-gl';
-
 /**
  * Calculate traffic color based on congestion level (0-100)
  */

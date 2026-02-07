@@ -97,18 +97,21 @@ export const TrafficFlow: React.FC<TrafficFlowProps> = ({ intensity, focusMode }
           count={particleData.count}
           array={particleData.positions}
           itemSize={3}
+          args={[particleData.positions, 3]}
         />
         <bufferAttribute
           attach="attributes-color"
           count={particleData.count}
           array={particleData.colors}
           itemSize={3}
+          args={[particleData.colors, 3]}
         />
         <bufferAttribute
           attach="attributes-size"
           count={particleData.count}
           array={particleData.sizes}
           itemSize={1}
+          args={[particleData.sizes, 1]}
         />
       </bufferGeometry>
       <pointsMaterial

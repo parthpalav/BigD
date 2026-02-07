@@ -123,7 +123,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
 
             {/* Travel Time Card */}
             <div
-                ref={(el) => (cardsRef.current[0] = el)}
+                ref={(el) => { cardsRef.current[0] = el; }}
                 style={{
                     ...cardStyle,
                     marginBottom: '1rem',
@@ -145,7 +145,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
 
             {/* Fuel Savings Card */}
             <div
-                ref={(el) => (cardsRef.current[1] = el)}
+                ref={(el) => { cardsRef.current[1] = el; }}
                 style={{
                     ...cardStyle,
                     marginBottom: '1rem',
@@ -167,7 +167,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
 
             {/* Congestion Level Card */}
             <div
-                ref={(el) => (cardsRef.current[2] = el)}
+                ref={(el) => { cardsRef.current[2] = el; }}
                 style={{
                     ...cardStyle,
                     marginBottom: '1rem',
@@ -196,7 +196,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
 
             {/* Optimal Time Card */}
             <div
-                ref={(el) => (cardsRef.current[3] = el)}
+                ref={(el) => { cardsRef.current[3] = el; }}
                 style={{
                     ...cardStyle,
                     marginBottom: '1rem',
@@ -218,7 +218,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
 
             {/* Peak Hours Card */}
             <div
-                ref={(el) => (cardsRef.current[4] = el)}
+                ref={(el) => { cardsRef.current[4] = el; }}
                 style={{
                     ...cardStyle,
                     background: theme === 'dark' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)',

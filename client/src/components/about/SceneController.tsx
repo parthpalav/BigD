@@ -12,6 +12,11 @@ export const SceneController: React.FC<SceneControllerProps> = ({ scrollProgress
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
 
+  // Log focus mode for debugging (can be used for future enhancements)
+  if (focusMode !== 'default') {
+    console.debug('Focus mode:', focusMode);
+  }
+
   useFrame(() => {
     // Calculate camera position based on scroll progress
     // Section 0 (0-0.2): Overview - high above

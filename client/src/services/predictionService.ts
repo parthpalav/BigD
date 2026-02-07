@@ -250,7 +250,7 @@ const findOptimalDate = (dateRange?: { start: Date; end: Date }): string => {
 /**
  * Generate timeline data for 24 hours
  */
-export const generateTimelineData = (route: Route): TimelineData[] => {
+export const generateTimelineData = (_route: Route): TimelineData[] => {
     const timeline: TimelineData[] = [];
 
     for (let hour = 0; hour < 24; hour++) {

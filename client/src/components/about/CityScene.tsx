@@ -93,15 +93,12 @@ export const CityScene: React.FC<CitySceneProps> = ({ scrollProgress, focusMode 
           const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
           return (
-            <line key={`road-${index}`} geometry={geometry}>
-              <lineBasicMaterial
-                attach="material"
-                color={getColor(road.type)}
-                linewidth={road.type === 'major' ? 3 : 1}
-                opacity={0.6 + scrollProgress * 0.4}
-                transparent
-              />
-            </line>
+            <primitive key={`road-${index}`} object={new THREE.Line(geometry, new THREE.LineBasicMaterial({
+              color: getColor(road.type),
+              linewidth: road.type === 'major' ? 3 : 1,
+              opacity: 0.6 + scrollProgress * 0.4,
+              transparent: true
+            }))} />
           );
         })}
       </group>

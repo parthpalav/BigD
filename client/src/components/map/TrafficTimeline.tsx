@@ -33,10 +33,6 @@ const TrafficTimeline: React.FC<TrafficTimelineProps> = ({
         setIsDragging(true);
     };
 
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!isDragging || !timelineRef.current) return;
 

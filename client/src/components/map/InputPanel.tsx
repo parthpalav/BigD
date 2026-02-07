@@ -1,6 +1,7 @@
 // InputPanel Component - AI Dashboard-style input interface
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+// @ts-ignore - No types available for @mapbox/mapbox-gl-geocoder
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import mapboxgl from 'mapbox-gl';
 import type { Location } from '../../services/predictionService';
