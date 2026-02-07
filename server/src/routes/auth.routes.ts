@@ -82,8 +82,9 @@ router.post(
         },
       });
     } catch (error) {
+      console.error('Registration error DETAILS:', error);
       logger.error('Registration error:', error);
-      res.status(500).json({ error: 'Failed to register user' });
+      res.status(500).json({ error: 'Failed to register user', details: error instanceof Error ? error.message : String(error) });
     }
   }
 );
