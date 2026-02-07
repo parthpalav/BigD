@@ -1,9 +1,49 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import Lenis from 'lenis';
 import './index.css';
+
+// Theme type
+type Theme = 'light' | 'dark';
+
+// Theme Toggle Button Component
+const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => void }) => {
+  return (
+    <motion.button
+      onClick={toggleTheme}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      style={{
+        position: 'fixed',
+        top: '2rem',
+        right: '2rem',
+        width: '50px',
+        height: '50px',
+        borderRadius: '50%',
+        background: theme === 'dark' 
+          ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
+          : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
+        border: 'none',
+        cursor: 'pointer',
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: theme === 'dark' 
+          ? '0 0 20px rgba(59, 130, 246, 0.4)'
+          : '0 0 20px rgba(251, 191, 36, 0.4)',
+        transition: 'all 0.3s ease',
+      }}
+    >
+      <span style={{ fontSize: '1.5rem' }}>
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </span>
+    </motion.button>
+  );
+};
 
 // Three.js Particle Field Component
 const ParticleField = () => {
@@ -16,7 +56,7 @@ const ParticleField = () => {
 };
 
 // Navigation Bar Component
-const NavigationBar = ({ showNav, onNavigate }: { showNav: boolean; onNavigate: () => void }) => {
+const NavigationBar = ({ showNav, onNavigate, theme }: { showNav: boolean; onNavigate: () => void; theme: Theme }) => {
   const navLinks = ['Home', 'Map', 'About Us'];
 
   return (
@@ -47,8 +87,9 @@ const NavigationBar = ({ showNav, onNavigate }: { showNav: boolean; onNavigate: 
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(10, 10, 10, 0.8)',
+              background: theme === 'dark' ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)',
               zIndex: -1,
+              transition: 'background 0.3s ease',
             }}
           />
 
@@ -108,7 +149,7 @@ const NavigationBar = ({ showNav, onNavigate }: { showNav: boolean; onNavigate: 
                     style={{
                       fontSize: '1rem',
                       fontWeight: 600,
-                      color: '#e5e5e5',
+                      color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
                       letterSpacing: '0.05em',
                       textDecoration: 'none',
                       transition: 'all 0.3s ease',
@@ -156,7 +197,7 @@ const NavigationBar = ({ showNav, onNavigate }: { showNav: boolean; onNavigate: 
 };
 
 // Hero with Scroll-Based Zoom Effect
-const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
+const Hero = ({ onExploreClick, theme }: { onExploreClick: () => void; theme: Theme }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -210,10 +251,12 @@ const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#fff',
+        color: theme === 'dark' ? '#fff' : '#000',
         textAlign: 'center',
         overflow: 'hidden',
         pointerEvents: scrollProgress > 0.9 ? 'none' : 'auto',
+        background: theme === 'dark' ? '#000' : '#fff',
+        transition: 'background 0.5s ease, color 0.5s ease',
       }}
     >
       {/* Three.js Background with Zoom Effect */}
@@ -245,9 +288,12 @@ const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.8) 100%)',
+          background: theme === 'dark' 
+            ? 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.8) 100%)'
+            : 'radial-gradient(ellipse at center, transparent 0%, rgba(255,255,255,0.8) 100%)',
           zIndex: 1,
           opacity: 1 - scrollProgress * 0.5,
+          transition: 'background 0.5s ease',
         }}
       />
 
@@ -291,6 +337,7 @@ const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
             letterSpacing: '-0.04em',
             marginBottom: '2rem',
             lineHeight: 1,
+            transition: 'color 0.5s ease',
           }}
         >
           ORION
@@ -302,11 +349,12 @@ const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
           transition={{ delay: 0.8, duration: 1 }}
           style={{
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)',
-            color: '#a0a0a0',
+            color: theme === 'dark' ? '#a0a0a0' : '#666',
             maxWidth: '700px',
             margin: '0 auto 3rem',
             fontWeight: 300,
             opacity: subtitleOpacity,
+            transition: 'color 0.5s ease',
           }}
         >
           Predicting Urban Movement Before It Happens
@@ -354,9 +402,10 @@ const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
             style={{
               width: '24px',
               height: '40px',
-              border: '2px solid #666',
+              border: theme === 'dark' ? '2px solid #666' : '2px solid #ccc',
               borderRadius: '9999px',
               position: 'relative',
+              transition: 'border-color 0.5s ease',
             }}
           >
             <motion.div
@@ -380,7 +429,7 @@ const Hero = ({ onExploreClick }: { onExploreClick: () => void }) => {
   );
 };
 
-const LoginSection = () => {
+const LoginSection = ({ theme }: { theme: Theme }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -428,7 +477,8 @@ const LoginSection = () => {
         flexDirection: 'row',
         position: 'relative',
         zIndex: 10,
-        background: '#000',
+        background: theme === 'dark' ? '#000' : '#fff',
+        transition: 'background 0.5s ease',
       }}
     >
       {/* Left Half - Branding */}
@@ -455,7 +505,6 @@ const LoginSection = () => {
               fontSize: 'clamp(3rem, 8vw, 6rem)',
               fontWeight: 900,
               letterSpacing: '-0.04em',
-              color: 'white',
               marginBottom: '1rem',
               background: 'linear-gradient(135deg, #ffffff 0%, #3b82f6 100%)',
               WebkitBackgroundClip: 'text',
@@ -469,9 +518,10 @@ const LoginSection = () => {
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.5rem)',
               fontWeight: 300,
-              color: '#a0a0a0',
+              color: theme === 'dark' ? '#a0a0a0' : '#666',
               marginTop: '1rem',
               letterSpacing: '0.05em',
+              transition: 'color 0.5s ease',
             }}
           >
             From Forecasts to Flow
@@ -483,7 +533,6 @@ const LoginSection = () => {
       <div
         style={{
           flex: 1,
-          background: '#141414',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -503,14 +552,21 @@ const LoginSection = () => {
             width: '100%',
             maxWidth: '450px',
             padding: '3rem 2.5rem',
-            background: 'rgba(20, 20, 20, 0.6)',
+            background: theme === 'dark' 
+              ? 'rgba(20, 20, 20, 0.6)' 
+              : 'rgba(255, 255, 255, 0.6)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: theme === 'dark' 
+              ? '1px solid rgba(255, 255, 255, 0.1)'
+              : '1px solid rgba(0, 0, 0, 0.1)',
             borderRadius: '1.5rem',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            boxShadow: theme === 'dark' 
+              ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+              : '0 8px 32px rgba(0, 0, 0, 0.1)',
             position: 'relative',
             overflow: 'hidden',
+            transition: 'all 0.5s ease',
           }}
         >
           {/* Animated gradient border on hover */}
@@ -537,9 +593,10 @@ const LoginSection = () => {
             style={{
               fontSize: '2rem',
               fontWeight: 700,
-              color: 'white',
+              color: theme === 'dark' ? 'white' : '#1a1a1a',
               marginBottom: '2rem',
               textAlign: 'center',
+              transition: 'color 0.5s ease',
             }}
           >
             Welcome Back
@@ -556,8 +613,9 @@ const LoginSection = () => {
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
-                  color: '#a0a0a0',
+                  color: theme === 'dark' ? '#a0a0a0' : '#666',
                   marginBottom: '0.5rem',
+                  transition: 'color 0.5s ease',
                 }}
               >
                 Username
@@ -572,15 +630,17 @@ const LoginSection = () => {
                   width: '100%',
                   padding: '0.75rem 1rem',
                   fontSize: '1rem',
-                  background: '#1a1a1a',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
+                  border: theme === 'dark' 
+                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                    : '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '0.5rem',
-                  color: 'white',
-                  transition: 'border-color 0.3s ease',
+                  color: theme === 'dark' ? 'white' : '#1a1a1a',
+                  transition: 'all 0.3s ease',
                   outline: 'none',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+                onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
               />
             </motion.div>
 
@@ -594,8 +654,9 @@ const LoginSection = () => {
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
-                  color: '#a0a0a0',
+                  color: theme === 'dark' ? '#a0a0a0' : '#666',
                   marginBottom: '0.5rem',
+                  transition: 'color 0.5s ease',
                 }}
               >
                 Password
@@ -610,15 +671,17 @@ const LoginSection = () => {
                   width: '100%',
                   padding: '0.75rem 1rem',
                   fontSize: '1rem',
-                  background: '#1a1a1a',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
+                  border: theme === 'dark' 
+                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                    : '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '0.5rem',
-                  color: 'white',
-                  transition: 'border-color 0.3s ease',
+                  color: theme === 'dark' ? 'white' : '#1a1a1a',
+                  transition: 'all 0.3s ease',
                   outline: 'none',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+                onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
               />
             </motion.div>
 
@@ -658,9 +721,24 @@ const LoginSection = () => {
               margin: '1.5rem 0',
             }}
           >
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
-            <span style={{ padding: '0 1rem', color: '#666', fontSize: '0.875rem' }}>OR</span>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
+            <div style={{ 
+              flex: 1, 
+              height: '1px', 
+              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              transition: 'background 0.5s ease'
+            }} />
+            <span style={{ 
+              padding: '0 1rem', 
+              color: '#666', 
+              fontSize: '0.875rem',
+              transition: 'color 0.5s ease'
+            }}>OR</span>
+            <div style={{ 
+              flex: 1, 
+              height: '1px', 
+              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              transition: 'background 0.5s ease'
+            }} />
           </motion.div>
 
           {/* Google Sign In Button */}
@@ -698,6 +776,43 @@ const LoginSection = () => {
             Sign in with Google
           </motion.button>
 
+          {/* Sign Up Link */}
+          <motion.div
+            variants={itemVariants}
+            style={{
+              marginTop: '1.5rem',
+              textAlign: 'center',
+            }}
+          >
+            <span style={{
+              fontSize: '0.875rem',
+              color: theme === 'dark' ? '#a0a0a0' : '#666',
+              transition: 'color 0.5s ease'
+            }}>
+              Don't have an account?{' '}
+            </span>
+            <Link
+              to="/signup"
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: '#3b82f6',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#0ea5e9';
+                e.currentTarget.style.textDecoration = 'underline';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#3b82f6';
+                e.currentTarget.style.textDecoration = 'none';
+              }}
+            >
+              Sign up
+            </Link>
+          </motion.div>
+
           <style>{`
             .login-gradient-border {
               animation: gradient-shift 3s ease infinite;
@@ -733,13 +848,16 @@ const LoginSection = () => {
   );
 };
 
-const Footer = () => {
+const Footer = ({ theme }: { theme: Theme }) => {
   return (
     <footer style={{
-      background: '#000',
-      borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+      background: theme === 'dark' ? '#000' : '#fff',
+      borderTop: theme === 'dark' 
+        ? '1px solid rgba(255, 255, 255, 0.05)'
+        : '1px solid rgba(0, 0, 0, 0.05)',
       padding: '3rem 2rem',
-      color: '#fff'
+      color: theme === 'dark' ? '#fff' : '#1a1a1a',
+      transition: 'all 0.5s ease',
     }}>
       <div style={{
         maxWidth: '1400px',
@@ -756,13 +874,15 @@ const Footer = () => {
         <p style={{
           fontSize: '0.875rem',
           color: '#666',
-          marginBottom: '2rem'
+          marginBottom: '2rem',
+          transition: 'color 0.5s ease'
         }}>
           AI-Powered Urban Traffic Intelligence
         </p>
         <p style={{
           fontSize: '0.875rem',
-          color: '#666'
+          color: '#666',
+          transition: 'color 0.5s ease'
         }}>
           © 2026 ORION. All rights reserved.
         </p>
@@ -773,7 +893,25 @@ const Footer = () => {
 
 function App() {
   const [showNav, setShowNav] = useState(true);
+  const [theme, setTheme] = useState<Theme>('dark');
   const lenisRef = useRef<Lenis | null>(null);
+
+  // Toggle theme
+  const toggleTheme = () => {
+    setTheme(prevTheme => {
+      const newTheme = prevTheme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      return newTheme;
+    });
+  };
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
 
   useEffect(() => {
     // Initialize smooth scrolling
@@ -825,13 +963,17 @@ function App() {
   };
 
   return (
-    <div style={{ background: '#000' }}>
-      <NavigationBar showNav={showNav} onNavigate={handleExploreClick} />
-      <Hero onExploreClick={handleExploreClick} />
+    <div style={{ 
+      background: theme === 'dark' ? '#000' : '#fff',
+      transition: 'background 0.5s ease'
+    }}>
+      <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+      <NavigationBar showNav={showNav} onNavigate={handleExploreClick} theme={theme} />
+      <Hero onExploreClick={handleExploreClick} theme={theme} />
       {/* Spacer to enable scrolling through zoom effect */}
       <div style={{ height: '100vh' }} />
-      <LoginSection />
-      <Footer />
+      <LoginSection theme={theme} />
+      <Footer theme={theme} />
     </div>
   );
 }
