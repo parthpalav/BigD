@@ -598,10 +598,56 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, user } = useAuth();
+  const { login, loginWithGoogle, user } = useAuth();
   const navigate = useNavigate();
-  // Google OAuth disabled - needs proper Google Cloud Console setup
-  // const googleButtonRef = useRef<HTMLDivElement>(null);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+
+  // Initialize Google Sign-In
+  useEffect(() => {
+    const initGoogle = () => {
+      if (window.google) {
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '371636086652-mg4agd7veafvi0ppqthq7ut9b12jj0je.apps.googleusercontent.com';
+        
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response: any) => {
+            try {
+              await loginWithGoogle(response.credential);
+              navigate('/map');
+            } catch (err) {
+              console.error('Google login failed:', err);
+              setError('Google login failed');
+            }
+          },
+        } as Parameters<typeof window.google.accounts.id.initialize>[0]);
+
+        const buttonDiv = googleButtonRef.current;
+        if (buttonDiv) {
+          window.google.accounts.id.renderButton(buttonDiv, {
+            theme: 'outline',
+            size: 'large',
+            width: 400,
+            text: 'signin_with',
+          } as Parameters<typeof window.google.accounts.id.renderButton>[1]);
+        }
+      }
+    };
+
+    // Check if Google API is already loaded
+    if (window.google) {
+      initGoogle();
+    } else {
+      // Wait for script to load
+      const checkGoogle = setInterval(() => {
+        if (window.google) {
+          clearInterval(checkGoogle);
+          initGoogle();
+        }
+      }, 100);
+
+      return () => clearInterval(checkGoogle);
+    }
+  }, [loginWithGoogle, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -975,8 +1021,17 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
                 }} />
               </motion.div>
 
-              {/* Google Sign In - Disabled (needs Google Cloud Console setup) */}
-              {/* Google OAuth button removed */}
+              {/* Google Sign In */}
+              <motion.div
+                variants={itemVariants}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <div ref={googleButtonRef}></div>
+              </motion.div>
 
               {/* Sign Up Link */}
               <motion.div
