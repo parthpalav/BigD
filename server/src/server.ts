@@ -89,13 +89,17 @@ class Server {
     try {
       // Initialize Neo4j Database
       try {
+        console.log('🔄 Connecting to Neo4j...');
+        console.log('NEO4J_URI:', process.env.NEO4J_URI ? 'SET' : 'MISSING');
+        console.log('NEO4J_USER:', process.env.NEO4J_USER ? 'SET' : 'MISSING');
+        console.log('NEO4J_PASSWORD:', process.env.NEO4J_PASSWORD ? 'SET' : 'MISSING');
         await initNeo4j();
         logger.info('✅ Neo4j connected successfully');
       } catch (dbError: any) {
+        console.error('❌ Neo4j connection failed:', dbError.message);
+        console.error('Full error:', dbError);
         logger.error('⚠️  Neo4j connection failed:', dbError.message);
-        logger.warn('💡 Please install Neo4j: brew install neo4j');
-        logger.warn('💡 Or set NEO4J_URI in .env to a running Neo4j instance');
-        logger.warn('💡 Default: bolt://localhost:7687 (user: neo4j, pass: neo4j)');
+        logger.warn('💡 Please check your NEO4J_URI, NEO4J_USER, and NEO4J_PASSWORD environment variables');
         process.exit(1);
       }
 
