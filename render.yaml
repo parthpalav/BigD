@@ -1,0 +1,63 @@
+services:
+  - type: web
+    name: orionmaps-api
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: API_VERSION
+        value: v1
+      # Get these from your server/.env file
+      - key: SECRET_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # Neo4j Cloud (already set up)
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        value: neo4j
+      - key: NEO4J_PASSWORD
+        sync: false
+      # Redis - Set up Upstash Redis at https://upstash.com
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_CACHE_TTL
+        value: 3600
+      # Google OAuth
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        value: https://orion-81736.web.app/auth/google/callback
+      # CORS - Allow your frontend domain
+      - key: CORS_ORIGINS
+        value: '["https://orion-81736.web.app","https://orionmaps.xyz"]'
+      # API Keys
+      - key: FEATHERLESS_API_KEY
+        sync: false
+      - key: FEATHERLESS_API_URL
+        value: https://api.featherless.ai/v1
+      - key: FIREBASE_PROJECT_ID
+        value: orion-81736
+      - key: FAST2SMS_API_KEY
+        sync: false
+      - key: WHATSAPP_BUSINESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
