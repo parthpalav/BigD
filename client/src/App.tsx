@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import Lenis from 'lenis';
 import { useAuth } from './hooks/useAuth';
+import { useTheme } from './hooks/useTheme';
 import './index.css';
 
 // Theme type
@@ -1020,26 +1021,10 @@ const Footer = ({ theme }: { theme: Theme }) => {
 
 function App() {
   const [showNav, setShowNav] = useState(true);
-  const [theme, setTheme] = useState<Theme>('dark');
+  const { theme, toggleTheme } = useTheme(); // Use theme from context
   const lenisRef = useRef<Lenis | null>(null);
 
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      return newTheme;
-    });
-  };
-
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
-
+  // Remove local theme state management - it's now in context
   useEffect(() => {
     // Initialize smooth scrolling
     const lenis = new Lenis({

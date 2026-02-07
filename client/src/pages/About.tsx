@@ -3,15 +3,12 @@ import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../hooks/useTheme';
 
 type Theme = 'light' | 'dark';
 
 const About: React.FC = () => {
-  const [theme, setTheme] = useState<Theme>('dark');
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+  const { theme, toggleTheme } = useTheme(); // Use theme from context
 
   return (
     <div
