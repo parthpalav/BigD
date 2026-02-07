@@ -38,20 +38,21 @@ const Login: React.FC = () => {
 
   // Initialize Google Sign-In
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
+    console.log('🔵 Google OAuth Init - Client ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+    
+    const initGoogle = () => {
       if (window.google) {
+        console.log('✅ Google API loaded');
+        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '371636086652-mg4agd7veafvi0ppqthq7ut9b12jj0je.apps.googleusercontent.com';
+        console.log('🔑 Using Client ID:', clientId);
+        
         window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '371636086652-mg4agd7veafvi0ppqthq7ut9b12jj0je.apps.googleusercontent.com',
+          client_id: clientId,
           callback: handleGoogleCallback,
         } as Parameters<typeof window.google.accounts.id.initialize>[0]);
 
         const buttonDiv = document.getElementById('google-signin-button');
+        console.log('📍 Button div:', buttonDiv);
         if (buttonDiv) {
           window.google.accounts.id.renderButton(buttonDiv, {
             theme: 'outline',
@@ -59,15 +60,29 @@ const Login: React.FC = () => {
             width: 350,
             text: isLogin ? 'signin_with' : 'signup_with',
           } as Parameters<typeof window.google.accounts.id.renderButton>[1]);
+          console.log('✅ Google button rendered');
+        } else {
+          console.error('❌ Button div not found!');
         }
+      } else {
+        console.error('❌ Google API not loaded');
       }
     };
 
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    // Check if Google API is already loaded
+    if (window.google) {
+      initGoogle();
+    } else {
+      // Wait for script to load
+      const checkGoogle = setInterval(() => {
+        if (window.google) {
+          clearInterval(checkGoogle);
+          initGoogle();
+        }
+      }, 100);
+
+      return () => clearInterval(checkGoogle);
+    }
   }, [isLogin, handleGoogleCallback]);
 
   const handleSubmit = async (e: React.FormEvent) => {
