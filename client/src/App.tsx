@@ -1,9 +1,19 @@
-export default function App() {
+import { useEffect, useState } from "react";
+import Intro from "./pages/Intro";
+
+function App() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <h1 className="text-4xl font-bold text-white">
-        Tailwind test
-      </h1>
-    </div>
+    <Intro
+      theme={theme}
+      onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+    />
   );
 }
+
+export default App;
