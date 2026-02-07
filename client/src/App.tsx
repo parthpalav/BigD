@@ -17,8 +17,8 @@ declare global {
     google?: {
       accounts: {
         id: {
-          initialize: (config: any) => void;
-          renderButton: (element: HTMLElement, config: any) => void;
+          initialize: (config: unknown) => void;
+          renderButton: (element: HTMLElement, config: unknown) => void;
           prompt: () => void;
         };
       };
@@ -40,7 +40,7 @@ const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => 
         width: '50px',
         height: '50px',
         borderRadius: '50%',
-        background: theme === 'dark' 
+        background: theme === 'dark'
           ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
           : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
         border: 'none',
@@ -49,7 +49,7 @@ const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: theme === 'dark' 
+        boxShadow: theme === 'dark'
           ? '0 0 20px rgba(59, 130, 246, 0.4)'
           : '0 0 20px rgba(251, 191, 36, 0.4)',
         transition: 'all 0.3s ease',
@@ -73,10 +73,10 @@ const ParticleField = () => {
 };
 
 // Navigation Bar Component
-const NavigationBar = ({ showNav, onNavigate, theme }: { showNav: boolean; onNavigate: () => void; theme: Theme }) => {
+const NavigationBar = ({ showNav, theme }: { showNav: boolean; theme: Theme }) => {
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Map', path: '/map' },
+    { name: 'Traffic Map', path: '/mapview' },
     { name: 'About', path: '/about' },
   ];
 
@@ -237,7 +237,7 @@ const Hero = ({ onExploreClick, theme }: { onExploreClick: () => void; theme: Th
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const viewportHeight = window.innerHeight;
-      
+
       // Calculate progress from 0 to 1 over first viewport height
       const progress = Math.min(scrollY / viewportHeight, 1);
       setScrollProgress(progress);
@@ -253,7 +253,6 @@ const Hero = ({ onExploreClick, theme }: { onExploreClick: () => void; theme: Th
   const scale = 1 + scrollProgress * 6; // Scale from 1 to 7
   const opacity = 1 - scrollProgress; // Fade from 1 to 0
   const subtitleOpacity = 1 - scrollProgress * 1.5; // Fade out faster
-  const scrollIndicatorOpacity = 1 - scrollProgress * 3; // Fade out immediately
   const particleOpacity = 1 - scrollProgress * 0.7; // Particles fade but not completely
   const blur = scrollProgress * 10; // Optional blur effect
 
@@ -304,7 +303,7 @@ const Hero = ({ onExploreClick, theme }: { onExploreClick: () => void; theme: Th
           left: 0,
           width: '100%',
           height: '100%',
-          background: theme === 'dark' 
+          background: theme === 'dark'
             ? 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.8) 100%)'
             : 'radial-gradient(ellipse at center, transparent 0%, rgba(255,255,255,0.8) 100%)',
           zIndex: 1,
@@ -450,71 +449,10 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, loginWithGoogle, user } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
-  const googleButtonRef = useRef<HTMLDivElement>(null);
-
-  // Initialize Google Sign-In
-  useEffect(() => {
-    const initializeGoogle = () => {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-      
-      if (!clientId) {
-        console.error('Google Client ID not found in environment variables');
-        return;
-      }
-
-      // Skip Google OAuth initialization - needs proper setup in Google Cloud Console
-      // if (window.google && googleButtonRef.current) {
-      //   try {
-      //     window.google.accounts.id.initialize({
-      //       client_id: clientId,
-      //       callback: handleGoogleResponse,
-      //     });
-
-      //     window.google.accounts.id.renderButton(
-      //       googleButtonRef.current,
-      //       {
-      //         theme: theme === 'dark' ? 'filled_black' : 'outline',
-      //         size: 'large',
-      //         width: googleButtonRef.current.offsetWidth,
-      //         text: 'signin_with',
-      //       }
-      //     );
-      //   } catch (err) {
-      //     console.error('Failed to initialize Google Sign-In:', err);
-      //     setError('Google Sign-In initialization failed');
-      //   }
-      // }
-    };
-
-    // Wait for Google script to load
-    // const checkGoogle = setInterval(() => {
-    //   if (window.google) {
-    //     clearInterval(checkGoogle);
-    //     initializeGoogle();
-    //   }
-    // }, 100);
-
-    // // Clear interval after 10 seconds if Google script doesn't load
-    // setTimeout(() => clearInterval(checkGoogle), 10000);
-
-    // return () => clearInterval(checkGoogle);
-  }, [theme]);
-
-  const handleGoogleResponse = async (response: any) => {
-    try {
-      setIsLoading(true);
-      setError('');
-      await loginWithGoogle(response.credential);
-      navigate('/map');
-    } catch (err: any) {
-      setError(err.message || 'Google sign-in failed');
-      console.error('Google sign-in error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Google OAuth disabled - needs proper Google Cloud Console setup
+  // const googleButtonRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -524,17 +462,13 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
     try {
       await login(username, password);
       navigate('/map');
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || 'Login failed');
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    console.log('Google Sign In clicked');
-    // The actual sign-in is handled by the Google button
   };
 
   const containerVariants = {
@@ -636,7 +570,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
       >
         <motion.div
           variants={itemVariants}
-          whileHover={{ 
+          whileHover={{
             scale: 1.02,
             boxShadow: '0 0 40px rgba(59, 130, 246, 0.3)',
           }}
@@ -645,16 +579,16 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
             width: '100%',
             maxWidth: '450px',
             padding: '3rem 2.5rem',
-            background: theme === 'dark' 
-              ? 'rgba(20, 20, 20, 0.6)' 
+            background: theme === 'dark'
+              ? 'rgba(20, 20, 20, 0.6)'
               : 'rgba(255, 255, 255, 0.6)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: theme === 'dark' 
+            border: theme === 'dark'
               ? '1px solid rgba(255, 255, 255, 0.1)'
               : '1px solid rgba(0, 0, 0, 0.1)',
             borderRadius: '1.5rem',
-            boxShadow: theme === 'dark' 
+            boxShadow: theme === 'dark'
               ? '0 8px 32px rgba(0, 0, 0, 0.4)'
               : '0 8px 32px rgba(0, 0, 0, 0.1)',
             position: 'relative',
@@ -702,23 +636,23 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
               style={{
                 textAlign: 'center',
                 padding: '2rem',
-                background: theme === 'dark' 
-                  ? 'rgba(59, 130, 246, 0.1)' 
+                background: theme === 'dark'
+                  ? 'rgba(59, 130, 246, 0.1)'
                   : 'rgba(59, 130, 246, 0.05)',
                 borderRadius: '0.5rem',
                 marginBottom: '1rem',
               }}
             >
-              <p style={{ 
+              <p style={{
                 color: theme === 'dark' ? '#a0a0a0' : '#666',
-                marginBottom: '1rem' 
+                marginBottom: '1rem'
               }}>
                 You are signed in as {user.email}
               </p>
               {user.profilePicture && (
-                <img 
-                  src={user.profilePicture} 
-                  alt="Profile" 
+                <img
+                  src={user.profilePicture}
+                  alt="Profile"
                   style={{
                     width: '80px',
                     height: '80px',
@@ -750,219 +684,188 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
                 </motion.div>
               )}
 
-          <form onSubmit={handleSubmit}>
-            {/* Username Input */}
-            <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="username"
+              <form onSubmit={handleSubmit}>
+                {/* Username Input */}
+                <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem' }}>
+                  <label
+                    htmlFor="username"
+                    style={{
+                      display: 'block',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      color: theme === 'dark' ? '#a0a0a0' : '#666',
+                      marginBottom: '0.5rem',
+                      transition: 'color 0.5s ease',
+                    }}
+                  >
+                    Username
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      fontSize: '1rem',
+                      background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
+                      border: theme === 'dark'
+                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                        : '1px solid rgba(0, 0, 0, 0.1)',
+                      borderRadius: '0.5rem',
+                      color: theme === 'dark' ? 'white' : '#1a1a1a',
+                      transition: 'all 0.3s ease',
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                  />
+                </motion.div>
+
+                {/* Password Input */}
+                <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem' }}>
+                  <label
+                    htmlFor="password"
+                    style={{
+                      display: 'block',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      color: theme === 'dark' ? '#a0a0a0' : '#666',
+                      marginBottom: '0.5rem',
+                      transition: 'color 0.5s ease',
+                    }}
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      fontSize: '1rem',
+                      background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
+                      border: theme === 'dark'
+                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                        : '1px solid rgba(0, 0, 0, 0.1)',
+                      borderRadius: '0.5rem',
+                      color: theme === 'dark' ? 'white' : '#1a1a1a',
+                      transition: 'all 0.3s ease',
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                  />
+                </motion.div>
+
+                {/* Login Button */}
+                <motion.button
+                  variants={itemVariants}
+                  type="submit"
+                  disabled={isLoading}
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  style={{
+                    width: '100%',
+                    padding: '1rem',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    background: isLoading
+                      ? 'rgba(59, 130, 246, 0.5)'
+                      : 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    color: 'white',
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)',
+                    transition: 'filter 0.2s ease',
+                    marginBottom: '1.5rem',
+                  }}
+                  onMouseEnter={(e) => !isLoading && (e.currentTarget.style.filter = 'brightness(1.1)')}
+                  onMouseLeave={(e) => e.currentTarget.style.filter = 'brightness(1)'}
+                >
+                  {isLoading ? 'Signing In...' : 'Sign In'}
+                </motion.button>
+              </form>
+
+              {/* Divider */}
+              <motion.div
+                variants={itemVariants}
                 style={{
-                  display: 'block',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: theme === 'dark' ? '#a0a0a0' : '#666',
-                  marginBottom: '0.5rem',
-                  transition: 'color 0.5s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  margin: '1.5rem 0',
                 }}
               >
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  fontSize: '1rem',
-                  background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
-                  border: theme === 'dark' 
-                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                    : '1px solid rgba(0, 0, 0, 0.1)',
-                  borderRadius: '0.5rem',
-                  color: theme === 'dark' ? 'white' : '#1a1a1a',
-                  transition: 'all 0.3s ease',
-                  outline: 'none',
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-              />
-            </motion.div>
+                <div style={{
+                  flex: 1,
+                  height: '1px',
+                  background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                  transition: 'background 0.5s ease'
+                }} />
+                <span style={{
+                  padding: '0 1rem',
+                  color: '#666',
+                  fontSize: '0.875rem',
+                  transition: 'color 0.5s ease'
+                }}>OR</span>
+                <div style={{
+                  flex: 1,
+                  height: '1px',
+                  background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                  transition: 'background 0.5s ease'
+                }} />
+              </motion.div>
 
-            {/* Password Input */}
-            <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem' }}>
-              <label
-                htmlFor="password"
+              {/* Google Sign In - Disabled (needs Google Cloud Console setup) */}
+              {/* Google OAuth button removed */}
+
+              {/* Sign Up Link */}
+              <motion.div
+                variants={itemVariants}
                 style={{
-                  display: 'block',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: theme === 'dark' ? '#a0a0a0' : '#666',
-                  marginBottom: '0.5rem',
-                  transition: 'color 0.5s ease',
+                  marginTop: '1.5rem',
+                  textAlign: 'center',
                 }}
               >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  fontSize: '1rem',
-                  background: theme === 'dark' ? '#1a1a1a' : '#f5f5f5',
-                  border: theme === 'dark' 
-                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                    : '1px solid rgba(0, 0, 0, 0.1)',
-                  borderRadius: '0.5rem',
-                  color: theme === 'dark' ? 'white' : '#1a1a1a',
-                  transition: 'all 0.3s ease',
-                  outline: 'none',
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-              />
-            </motion.div>
-
-            {/* Login Button */}
-            <motion.button
-              variants={itemVariants}
-              type="submit"
-              disabled={isLoading}
-              whileHover={{ scale: isLoading ? 1 : 1.02 }}
-              whileTap={{ scale: isLoading ? 1 : 0.98 }}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                fontSize: '1rem',
-                fontWeight: 600,
-                background: isLoading 
-                  ? 'rgba(59, 130, 246, 0.5)'
-                  : 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
-                border: 'none',
-                borderRadius: '0.5rem',
-                color: 'white',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)',
-                transition: 'filter 0.2s ease',
-                marginBottom: '1.5rem',
-              }}
-              onMouseEnter={(e) => !isLoading && (e.currentTarget.style.filter = 'brightness(1.1)')}
-              onMouseLeave={(e) => e.currentTarget.style.filter = 'brightness(1)'}
-            >
-              {isLoading ? 'Signing In...' : 'Sign In'}
-            </motion.button>
-          </form>
-
-          {/* Divider */}
-          <motion.div
-            variants={itemVariants}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              margin: '1.5rem 0',
-            }}
-          >
-            <div style={{ 
-              flex: 1, 
-              height: '1px', 
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-              transition: 'background 0.5s ease'
-            }} />
-            <span style={{ 
-              padding: '0 1rem', 
-              color: '#666', 
-              fontSize: '0.875rem',
-              transition: 'color 0.5s ease'
-            }}>OR</span>
-            <div style={{ 
-              flex: 1, 
-              height: '1px', 
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-              transition: 'background 0.5s ease'
-            }} />
-          </motion.div>
-
-          {/* Google Sign In - Disabled (needs Google Cloud Console setup) */}
-          {/* <motion.div
-            variants={itemVariants}
-          >
-            <div style={{ 
-              flex: 1, 
-              height: '1px', 
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-              transition: 'background 0.5s ease'
-            }} />
-            <span style={{ 
-              padding: '0 1rem', 
-              color: '#666', 
-              fontSize: '0.875rem',
-              transition: 'color 0.5s ease'
-            }}>OR</span>
-            <div style={{ 
-              flex: 1, 
-              height: '1px', 
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-              transition: 'background 0.5s ease'
-            }} />
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            ref={googleButtonRef}
-            style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          /> */}
-
-          {/* Sign Up Link */}
-          <motion.div
-            variants={itemVariants}
-            style={{
-              marginTop: '1.5rem',
-              textAlign: 'center',
-            }}
-          >
-            <span style={{
-              fontSize: '0.875rem',
-              color: theme === 'dark' ? '#a0a0a0' : '#666',
-              transition: 'color 0.5s ease'
-            }}>
-              Don't have an account?{' '}
-            </span>
-            <Link
-              to="/signup"
-              style={{
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                color: '#3b82f6',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#0ea5e9';
-                e.currentTarget.style.textDecoration = 'underline';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#3b82f6';
-                e.currentTarget.style.textDecoration = 'none';
-              }}
-            >
-              Sign up
-            </Link>
-          </motion.div>
-          </>
+                <span style={{
+                  fontSize: '0.875rem',
+                  color: theme === 'dark' ? '#a0a0a0' : '#666',
+                  transition: 'color 0.5s ease'
+                }}>
+                  Don't have an account?{' '}
+                </span>
+                <Link
+                  to="/signup"
+                  style={{
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#3b82f6',
+                    textDecoration: 'none',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#0ea5e9';
+                    e.currentTarget.style.textDecoration = 'underline';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#3b82f6';
+                    e.currentTarget.style.textDecoration = 'none';
+                  }}
+                >
+                  Sign up
+                </Link>
+              </motion.div>
+            </>
           )}
 
           <style>{`
@@ -1004,7 +907,7 @@ const Footer = ({ theme }: { theme: Theme }) => {
   return (
     <footer style={{
       background: theme === 'dark' ? '#000' : '#fff',
-      borderTop: theme === 'dark' 
+      borderTop: theme === 'dark'
         ? '1px solid rgba(255, 255, 255, 0.05)'
         : '1px solid rgba(0, 0, 0, 0.05)',
       padding: '3rem 2rem',
@@ -1072,6 +975,22 @@ function App() {
     };
   }, []);
 
+  // Handle hash-based navigation (e.g., /#login from protected routes)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === '#login') {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const loginSection = document.getElementById('login');
+        if (loginSection) {
+          loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Clear the hash from URL after scrolling
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }, 100);
+    }
+  }, []);
+
   // Handle nav visibility based on scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -1099,12 +1018,12 @@ function App() {
   };
 
   return (
-    <div style={{ 
+    <div style={{
       background: theme === 'dark' ? '#000' : '#fff',
       transition: 'background 0.5s ease'
     }}>
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-      <NavigationBar showNav={showNav} onNavigate={handleExploreClick} theme={theme} />
+      <NavigationBar showNav={showNav} theme={theme} />
       <Hero onExploreClick={handleExploreClick} theme={theme} />
       {/* Spacer to enable scrolling through zoom effect */}
       <div style={{ height: '100vh' }} />

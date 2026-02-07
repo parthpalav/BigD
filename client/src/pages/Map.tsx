@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-
-type Theme = 'light' | 'dark';
 
 const Map: React.FC = () => {
   const { theme, toggleTheme } = useTheme(); // Use theme from context

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import Lenis from 'lenis';
 import { useTheme } from '../hooks/useTheme';
+import { useAuth } from '../hooks/useAuth';
 
 // Theme type
 type Theme = 'light' | 'dark';
@@ -57,6 +58,10 @@ const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => 
 
 const SignupPage = () => {
   const { theme, toggleTheme } = useTheme(); // Use theme from context
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -97,10 +102,39 @@ const SignupPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signup submitted:', formData);
-    // Handle signup logic here (backend implementation)
+    setError('');
+    
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+    
+    if (!formData.name || !formData.email) {
+      setError('Name and email are required');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      await register(formData.email, formData.password, formData.name, formData.phone || undefined);
+      // Registration successful, navigate to map page
+      navigate('/map');
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const containerVariants = {
@@ -248,6 +282,25 @@ const SignupPage = () => {
               Join the future of urban traffic intelligence
             </p>
           </motion.div>
+
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                marginBottom: '1rem',
+                padding: '0.75rem',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '0.5rem',
+                color: '#ef4444',
+                fontSize: '0.875rem',
+              }}
+            >
+              {error}
+            </motion.div>
+          )}
 
           <form onSubmit={handleSubmit}>
             {/* Name Input */}
@@ -601,26 +654,30 @@ const SignupPage = () => {
             <motion.button
               variants={itemVariants}
               type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              disabled={isLoading}
+              whileHover={{ scale: isLoading ? 1 : 1.02 }}
+              whileTap={{ scale: isLoading ? 1 : 0.98 }}
               style={{
                 width: '100%',
                 padding: '1rem',
                 fontSize: '1rem',
                 fontWeight: 600,
-                background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
+                background: isLoading 
+                  ? 'linear-gradient(135deg, #6b7280 0%, #9ca3af 50%, #6b7280 100%)'
+                  : 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
                 border: 'none',
                 borderRadius: '0.5rem',
                 color: 'white',
-                cursor: 'pointer',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
                 boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)',
-                transition: 'filter 0.2s ease',
+                transition: 'filter 0.2s ease, background 0.3s ease',
                 marginBottom: '1.5rem',
+                opacity: isLoading ? 0.7 : 1,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(1.1)'}
+              onMouseEnter={(e) => !isLoading && (e.currentTarget.style.filter = 'brightness(1.1)')}
               onMouseLeave={(e) => e.currentTarget.style.filter = 'brightness(1)'}
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </motion.button>
           </form>
 
