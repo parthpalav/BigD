@@ -36,38 +36,38 @@ const Login: React.FC = () => {
     }
   }, [loginWithGoogle, navigate]);
 
-  // Initialize Google Sign-In
+  // Initialize Google Sign-In - Disabled (needs proper Google Cloud Console setup)
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+    // const script = document.createElement('script');
+    // script.src = 'https://accounts.google.com/gsi/client';
+    // script.async = true;
+    // script.defer = true;
+    // document.body.appendChild(script);
 
-    script.onload = () => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
-          callback: handleGoogleCallback,
-        } as Parameters<typeof window.google.accounts.id.initialize>[0]);
+    // script.onload = () => {
+    //   if (window.google) {
+    //     window.google.accounts.id.initialize({
+    //       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
+    //       callback: handleGoogleCallback,
+    //     } as Parameters<typeof window.google.accounts.id.initialize>[0]);
 
-        const buttonDiv = document.getElementById('google-signin-button');
-        if (buttonDiv) {
-          window.google.accounts.id.renderButton(buttonDiv, {
-            theme: 'outline',
-            size: 'large',
-            width: 350,
-            text: isLogin ? 'signin_with' : 'signup_with',
-          } as Parameters<typeof window.google.accounts.id.renderButton>[1]);
-        }
-      }
-    };
+    //     const buttonDiv = document.getElementById('google-signin-button');
+    //     if (buttonDiv) {
+    //       window.google.accounts.id.renderButton(buttonDiv, {
+    //         theme: 'outline',
+    //         size: 'large',
+    //         width: 350,
+    //         text: isLogin ? 'signin_with' : 'signup_with',
+    //       } as Parameters<typeof window.google.accounts.id.renderButton>[1]);
+    //     }
+    //   }
+    // };
 
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    // return () => {
+    //   if (document.body.contains(script)) {
+    //     document.body.removeChild(script);
+    //   }
+    // };
   }, [isLogin, handleGoogleCallback]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,7 +207,8 @@ const Login: React.FC = () => {
             </motion.button>
           </form>
 
-          <div className="my-6 flex items-center gap-4">
+          {/* Google OAuth - Disabled (needs proper Google Cloud Console setup) */}
+          {/* <div className="my-6 flex items-center gap-4">
             <div className="flex-1 h-px bg-white/20"></div>
             <span className="text-white/50 text-sm">or</span>
             <div className="flex-1 h-px bg-white/20"></div>
@@ -215,7 +216,7 @@ const Login: React.FC = () => {
 
           <div className="flex justify-center">
             <div id="google-signin-button"></div>
-          </div>
+          </div> */}
 
           <div className="mt-6 text-center">
             <button

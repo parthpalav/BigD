@@ -464,41 +464,42 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
         return;
       }
 
-      if (window.google && googleButtonRef.current) {
-        try {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: handleGoogleResponse,
-          });
+      // Skip Google OAuth initialization - needs proper setup in Google Cloud Console
+      // if (window.google && googleButtonRef.current) {
+      //   try {
+      //     window.google.accounts.id.initialize({
+      //       client_id: clientId,
+      //       callback: handleGoogleResponse,
+      //     });
 
-          window.google.accounts.id.renderButton(
-            googleButtonRef.current,
-            {
-              theme: theme === 'dark' ? 'filled_black' : 'outline',
-              size: 'large',
-              width: googleButtonRef.current.offsetWidth,
-              text: 'signin_with',
-            }
-          );
-        } catch (err) {
-          console.error('Failed to initialize Google Sign-In:', err);
-          setError('Google Sign-In initialization failed');
-        }
-      }
+      //     window.google.accounts.id.renderButton(
+      //       googleButtonRef.current,
+      //       {
+      //         theme: theme === 'dark' ? 'filled_black' : 'outline',
+      //         size: 'large',
+      //         width: googleButtonRef.current.offsetWidth,
+      //         text: 'signin_with',
+      //       }
+      //     );
+      //   } catch (err) {
+      //     console.error('Failed to initialize Google Sign-In:', err);
+      //     setError('Google Sign-In initialization failed');
+      //   }
+      // }
     };
 
     // Wait for Google script to load
-    const checkGoogle = setInterval(() => {
-      if (window.google) {
-        clearInterval(checkGoogle);
-        initializeGoogle();
-      }
-    }, 100);
+    // const checkGoogle = setInterval(() => {
+    //   if (window.google) {
+    //     clearInterval(checkGoogle);
+    //     initializeGoogle();
+    //   }
+    // }, 100);
 
-    // Clear interval after 10 seconds if Google script doesn't load
-    setTimeout(() => clearInterval(checkGoogle), 10000);
+    // // Clear interval after 10 seconds if Google script doesn't load
+    // setTimeout(() => clearInterval(checkGoogle), 10000);
 
-    return () => clearInterval(checkGoogle);
+    // return () => clearInterval(checkGoogle);
   }, [theme]);
 
   const handleGoogleResponse = async (response: any) => {
@@ -891,7 +892,30 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
             }} />
           </motion.div>
 
-          {/* Google Sign In Button */}
+          {/* Google Sign In - Disabled (needs Google Cloud Console setup) */}
+          {/* <motion.div
+            variants={itemVariants}
+          >
+            <div style={{ 
+              flex: 1, 
+              height: '1px', 
+              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              transition: 'background 0.5s ease'
+            }} />
+            <span style={{ 
+              padding: '0 1rem', 
+              color: '#666', 
+              fontSize: '0.875rem',
+              transition: 'color 0.5s ease'
+            }}>OR</span>
+            <div style={{ 
+              flex: 1, 
+              height: '1px', 
+              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              transition: 'background 0.5s ease'
+            }} />
+          </motion.div>
+
           <motion.div
             variants={itemVariants}
             ref={googleButtonRef}
@@ -900,7 +924,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
               display: 'flex',
               justifyContent: 'center',
             }}
-          />
+          /> */}
 
           {/* Sign Up Link */}
           <motion.div
