@@ -5,6 +5,10 @@ node_modules/
 .env
 .env.local
 
+# Firebase credentials (NEVER commit these!)
+**/firebase-credentials.json
+config/firebase-credentials.json
+
 # Logs
 logs/
 *.log
