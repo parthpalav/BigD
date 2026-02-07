@@ -384,7 +384,7 @@ const Hero = ({ onExploreClick, theme }: { onExploreClick: () => void; theme: Th
         </motion.button>
 
         {/* Scroll Indicator */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
@@ -423,7 +423,7 @@ const Hero = ({ onExploreClick, theme }: { onExploreClick: () => void; theme: Th
               }}
             />
           </motion.div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );
