@@ -1,13 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-function App() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<h1>Home</h1>} />
-      </Routes>
-    </BrowserRouter>
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <h1 className="text-4xl font-bold text-white">
+        Tailwind test
+      </h1>
+    </div>
   );
 }
-
-export default App;
