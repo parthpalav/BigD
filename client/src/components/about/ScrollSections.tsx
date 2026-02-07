@@ -44,8 +44,8 @@ export const ScrollSections: React.FC<ScrollSectionsProps> = ({ theme }) => {
           <motion.div
             initial={{ opacity: 0, x: -100 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ amount: 0.5, once: false }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            viewport={{ amount: 0.2, once: false }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
             className="max-w-2xl"
           >
             <motion.p
@@ -54,8 +54,8 @@ export const ScrollSections: React.FC<ScrollSectionsProps> = ({ theme }) => {
               }`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ amount: 0.5, once: false }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ amount: 0.2, once: false }}
+              transition={{ duration: 0.4, delay: 0 }}
             >
               {section.subtitle}
             </motion.p>
@@ -66,8 +66,8 @@ export const ScrollSections: React.FC<ScrollSectionsProps> = ({ theme }) => {
               }`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ amount: 0.5, once: false }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              viewport={{ amount: 0.2, once: false }}
+              transition={{ duration: 0.5, delay: 0.05 }}
             >
               {section.title}
             </motion.h2>
@@ -78,8 +78,8 @@ export const ScrollSections: React.FC<ScrollSectionsProps> = ({ theme }) => {
               }`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ amount: 0.5, once: false }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              viewport={{ amount: 0.2, once: false }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               {section.description}
             </motion.p>

@@ -26,6 +26,154 @@ declare global {
   }
 }
 
+// Hamburger Menu Component
+const HamburgerMenu = ({ theme }: { theme: Theme }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: 'fixed', top: '2rem', left: '2rem', zIndex: 100 }}>
+      {/* Hamburger Button */}
+      <motion.button
+        onClick={() => setIsOpen(!isOpen)}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          width: '50px',
+          height: '50px',
+          background: theme === 'dark'
+            ? 'rgba(20, 20, 20, 0.8)'
+            : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: theme === 'dark'
+            ? '1px solid rgba(255, 255, 255, 0.1)'
+            : '1px solid rgba(0, 0, 0, 0.1)',
+          borderRadius: '0.75rem',
+          cursor: 'pointer',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '5px',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        <motion.div
+          animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            width: '24px',
+            height: '2px',
+            background: theme === 'dark' ? '#fff' : '#1a1a1a',
+            borderRadius: '2px',
+          }}
+        />
+        <motion.div
+          animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          style={{
+            width: '24px',
+            height: '2px',
+            background: theme === 'dark' ? '#fff' : '#1a1a1a',
+            borderRadius: '2px',
+          }}
+        />
+        <motion.div
+          animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            width: '24px',
+            height: '2px',
+            background: theme === 'dark' ? '#fff' : '#1a1a1a',
+            borderRadius: '2px',
+          }}
+        />
+      </motion.button>
+
+      {/* Dropdown Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 10, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              width: '200px',
+              background: theme === 'dark'
+                ? 'rgba(20, 20, 20, 0.95)'
+                : 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: theme === 'dark'
+                ? '1px solid rgba(255, 255, 255, 0.1)'
+                : '1px solid rgba(0, 0, 0, 0.1)',
+              borderRadius: '0.75rem',
+              padding: '0.5rem',
+              boxShadow: theme === 'dark'
+                ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                : '0 8px 32px rgba(0, 0, 0, 0.15)',
+            }}
+          >
+            {/* Settings */}
+            <motion.div
+              whileHover={{ x: 5 }}
+              style={{
+                padding: '0.75rem 1rem',
+                cursor: 'pointer',
+                borderRadius: '0.5rem',
+                transition: 'background 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                color: theme === 'dark' ? '#fff' : '#1a1a1a',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = theme === 'dark'
+                  ? 'rgba(59, 130, 246, 0.2)'
+                  : 'rgba(59, 130, 246, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <span style={{ fontSize: '1.25rem' }}>⚙️</span>
+              <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Settings</span>
+            </motion.div>
+
+            {/* History */}
+            <motion.div
+              whileHover={{ x: 5 }}
+              style={{
+                padding: '0.75rem 1rem',
+                cursor: 'pointer',
+                borderRadius: '0.5rem',
+                transition: 'background 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                color: theme === 'dark' ? '#fff' : '#1a1a1a',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = theme === 'dark'
+                  ? 'rgba(59, 130, 246, 0.2)'
+                  : 'rgba(59, 130, 246, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <span style={{ fontSize: '1.25rem' }}>📜</span>
+              <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>History</span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 // Theme Toggle Button Component
 const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => void }) => {
   return (
@@ -94,7 +242,7 @@ const NavigationBar = ({ showNav, theme }: { showNav: boolean; theme: Theme }) =
             left: 0,
             right: 0,
             zIndex: 50,
-            padding: '1.5rem 2rem',
+            padding: '2rem 2rem',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
@@ -158,8 +306,9 @@ const NavigationBar = ({ showNav, theme }: { showNav: boolean; theme: Theme }) =
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 * index, duration: 0.5 }}
                       whileHover={{
-                        scale: 1.05,
+                        scale: 1.8,
                         color: '#3b82f6',
+                        transition: { duration: 0.25 },
                       }}
                       style={{
                         fontSize: '1rem',
@@ -1022,6 +1171,7 @@ function App() {
       background: theme === 'dark' ? '#000' : '#fff',
       transition: 'background 0.5s ease'
     }}>
+      <HamburgerMenu theme={theme} />
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
       <NavigationBar showNav={showNav} theme={theme} />
       <Hero onExploreClick={handleExploreClick} theme={theme} />

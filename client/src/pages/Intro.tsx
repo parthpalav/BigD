@@ -36,7 +36,7 @@ export default function Intro({ theme, onToggleTheme }: IntroProps) {
     >
       {showNav && (
         <nav
-          className="fixed top-0 left-1/2 z-50 -translate-x-1/2 px-12 py-6 backdrop-blur-md"
+          className="fixed top-0 left-1/2 z-50 -translate-x-1/2 px-12 py-8 backdrop-blur-md"
           style={{
             backgroundColor: "var(--nav)",
             fontFamily:
@@ -45,17 +45,17 @@ export default function Intro({ theme, onToggleTheme }: IntroProps) {
         >
           <ul className="flex items-center gap-12 text-3xl font-bold">
             <li>
-              <a className="bg-transparent transition-transform duration-200 hover:scale-125" href="">
+              <a className="bg-transparent transition-transform duration-250 hover:scale-180" href="">
                 Home
               </a>
             </li>
             <li>
-              <a className="bg-transparent transition-transform duration-200 hover:scale-125" href="">
+              <a className="bg-transparent transition-transform duration-250 hover:scale-180" href="">
                 Maps
               </a>
             </li>
             <li>
-              <a className="bg-transparent transition-transform duration-200 hover:scale-125" href="">
+              <a className="bg-transparent transition-transform duration-250 hover:scale-180" href="">
                 About us
               </a>
             </li>
