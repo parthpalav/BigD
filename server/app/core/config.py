@@ -44,11 +44,12 @@ class Settings(BaseSettings):
     FIREBASE_CREDENTIALS_PATH: str = "./config/firebase-credentials.json"
     FIREBASE_PROJECT_ID: str
     
-    # Twilio
-    TWILIO_ACCOUNT_SID: str
-    TWILIO_AUTH_TOKEN: str
-    TWILIO_PHONE_NUMBER: str
-    TWILIO_WHATSAPP_NUMBER: str
+    # Fast2SMS (Indian SMS)
+    FAST2SMS_API_KEY: str
+    
+    # WhatsApp Business API
+    WHATSAPP_BUSINESS_TOKEN: str
+    WHATSAPP_PHONE_NUMBER_ID: str
     
     # Email
     SENDGRID_API_KEY: str

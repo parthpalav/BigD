@@ -17,7 +17,9 @@ class NotificationService:
     
     def __init__(self):
         self.firebase_initialized = False
-        self.twilio_client = None
+        self.fast2sms_api_key = settings.FAST2SMS_API_KEY
+        self.whatsapp_token = settings.WHATSAPP_BUSINESS_TOKEN
+        self.whatsapp_phone_id = settings.WHATSAPP_PHONE_NUMBER_ID
         self.sendgrid_client = None
         self._initialize_services()
     
@@ -38,16 +40,14 @@ class NotificationService:
         except Exception as e:
             logger.warning(f"Firebase initialization failed: {e}")
         
-        # Twilio (SMS & WhatsApp)
+        # Fast2SMS & WhatsApp Business API
         try:
-            from twilio.rest import Client
-            self.twilio_client = Client(
-                settings.TWILIO_ACCOUNT_SID,
-                settings.TWILIO_AUTH_TOKEN
-            )
-            logger.info("Twilio initialized")
+            if self.fast2sms_api_key:
+                logger.info("Fast2SMS configured")
+            if self.whatsapp_token:
+                logger.info("WhatsApp Business API configured")
         except Exception as e:
-            logger.warning(f"Twilio initialization failed: {e}")
+            logger.warning(f"SMS/WhatsApp initialization failed: {e}")
         
         # SendGrid (Email)
         try:
@@ -165,27 +165,51 @@ class NotificationService:
         message: str
     ) -> bool:
         """
-        Send SMS via Twilio
+        Send SMS via Fast2SMS
         
         Args:
-            to_phone: Recipient phone number
+            to_phone: Recipient phone number (Indian: 10 digits)
             message: SMS message body
         
         Returns:
             Success status
         """
-        if not self.twilio_client:
-            logger.error("Twilio not initialized")
+        if not self.fast2sms_api_key:
+            logger.error("Fast2SMS not configured")
             return False
         
         try:
-            result = self.twilio_client.messages.create(
-                body=message,
-                from_=settings.TWILIO_PHONE_NUMBER,
-                to=to_phone
-            )
-            logger.info(f"SMS sent to {to_phone}: {result.sid}")
-            return True
+            import httpx
+            
+            # Remove country code if present (Fast2SMS uses 10-digit numbers)
+            phone = to_phone.replace('+91', '').replace('+', '')[-10:]
+            
+            url = "https://www.fast2sms.com/dev/bulkV2"
+            headers = {
+                "authorization": self.fast2sms_api_key
+            }
+            params = {
+                "route": "q",
+                "message": message,
+                "language": "english",
+                "flash": 0,
+                "numbers": phone
+            }
+            
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(url, headers=headers, params=params)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("return") == True:
+                        logger.info(f"SMS sent to {phone} via Fast2SMS")
+                        return True
+                    else:
+                        logger.error(f"Fast2SMS error: {result.get('message')}")
+                        return False
+                else:
+                    logger.error(f"Fast2SMS API error: {response.status_code}")
+                    return False
         
         except Exception as e:
             logger.error(f"SMS send error: {e}")
@@ -197,31 +221,52 @@ class NotificationService:
         message: str
     ) -> bool:
         """
-        Send WhatsApp message via Twilio
+        Send WhatsApp message via WhatsApp Business API
         
         Args:
-            to_phone: Recipient phone number (with country code)
+            to_phone: Recipient phone number (with country code, e.g., 919876543210)
             message: WhatsApp message body
         
         Returns:
             Success status
         """
-        if not self.twilio_client:
-            logger.error("Twilio not initialized")
+        if not self.whatsapp_token or not self.whatsapp_phone_id:
+            logger.error("WhatsApp Business API not configured")
             return False
         
         try:
-            # Ensure phone number has whatsapp: prefix
-            if not to_phone.startswith('whatsapp:'):
-                to_phone = f'whatsapp:{to_phone}'
+            import httpx
             
-            result = self.twilio_client.messages.create(
-                body=message,
-                from_=settings.TWILIO_WHATSAPP_NUMBER,
-                to=to_phone
-            )
-            logger.info(f"WhatsApp sent to {to_phone}: {result.sid}")
-            return True
+            # Format phone number (remove + if present)
+            phone = to_phone.replace('+', '').replace('whatsapp:', '')
+            
+            url = f"https://graph.facebook.com/v18.0/{self.whatsapp_phone_id}/messages"
+            headers = {
+                "Authorization": f"Bearer {self.whatsapp_token}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": phone,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": message
+                }
+            }
+            
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.post(url, headers=headers, json=payload)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    message_id = result.get("messages", [{}])[0].get("id")
+                    logger.info(f"WhatsApp sent to {phone}: {message_id}")
+                    return True
+                else:
+                    logger.error(f"WhatsApp API error: {response.status_code} - {response.text}")
+                    return False
         
         except Exception as e:
             logger.error(f"WhatsApp send error: {e}")

@@ -36,7 +36,6 @@ bcrypt==4.1.2
 
 # Messaging Services
 firebase-admin==6.4.0
-twilio==8.11.1
 
 # Email
 python-smtp==0.2.0
