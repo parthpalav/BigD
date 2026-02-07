@@ -19,8 +19,14 @@
   "license": "MIT",
   "dependencies": {
     "@tensorflow/tfjs-node": "^4.17.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/bull": "^4.10.0",
     "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/morgan": "^1.9.10",
+    "@types/node": "^20.11.16",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-jwt": "^4.0.1",
@@ -45,18 +51,12 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.1",
+    "typescript": "^5.3.3",
     "uuid": "^13.0.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/bull": "^4.10.0",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.5",
-    "@types/node": "^20.11.16",
     "nodemon": "^3.0.3",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "ts-node": "^10.9.2"
   }
 }
