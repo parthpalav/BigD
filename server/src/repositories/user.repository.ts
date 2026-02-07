@@ -6,9 +6,13 @@ export interface UserNode {
   id: string;
   email: string;
   passwordHash: string;
+  password: string; // Alias for passwordHash
   fullName?: string;
   phoneNumber?: string;
   fcmToken?: string;
+  googleId?: string;
+  profilePicture?: string;
+  lastLogin?: Date;
   isActive: boolean;
   isVerified: boolean;
   createdAt: Date;
@@ -16,11 +20,18 @@ export interface UserNode {
 }
 
 export class UserRepository {
-  async create(data: { email: string; password: string; fullName?: string; phoneNumber?: string }): Promise<Omit<UserNode, 'passwordHash'>> {
+  async create(data: { 
+    email: string; 
+    password: string; 
+    fullName?: string; 
+    phoneNumber?: string;
+    googleId?: string;
+    profilePicture?: string;
+  }): Promise<Omit<UserNode, 'passwordHash'>> {
     const session = getNeo4jSession();
     try {
       const id = uuidv4();
-      const passwordHash = await bcrypt.hash(data.password, 10);
+      const passwordHash = data.password ? await bcrypt.hash(data.password, 10) : '';
       const now = new Date();
 
       const result = await session.run(
@@ -30,13 +41,24 @@ export class UserRepository {
           passwordHash: $passwordHash,
           fullName: $fullName,
           phoneNumber: $phoneNumber,
+          googleId: $googleId,
+          profilePicture: $profilePicture,
           isActive: true,
           isVerified: false,
           createdAt: datetime($now),
           updatedAt: datetime($now)
         })
         RETURN u`,
-        { id, email: data.email, passwordHash, fullName: data.fullName, phoneNumber: data.phoneNumber, now: now.toISOString() }
+        { 
+          id, 
+          email: data.email, 
+          passwordHash, 
+          fullName: data.fullName, 
+          phoneNumber: data.phoneNumber,
+          googleId: data.googleId,
+          profilePicture: data.profilePicture,
+          now: now.toISOString() 
+        }
       );
 
       const user = this.nodeToUser(result.records[0].get('u'));
@@ -62,6 +84,72 @@ export class UserRepository {
     }
   }
 
+  async findById(userId: string): Promise<UserNode | null> {
+    const session = getNeo4jSession();
+    try {
+      const result = await session.run(
+        'MATCH (u:User {id: $userId}) RETURN u',
+        { userId }
+      );
+
+      if (result.records.length === 0) return null;
+      return this.nodeToUser(result.records[0].get('u'));
+    } finally {
+      await session.close();
+    }
+  }
+
+  async update(userId: string, data: { 
+    fullName?: string; 
+    phoneNumber?: string;
+    profilePicture?: string;
+  }): Promise<UserNode> {
+    const session = getNeo4jSession();
+    try {
+      const updates: string[] = [];
+      const params: any = { userId, now: new Date().toISOString() };
+
+      if (data.fullName !== undefined) {
+        updates.push('u.fullName = $fullName');
+        params.fullName = data.fullName;
+      }
+      if (data.phoneNumber !== undefined) {
+        updates.push('u.phoneNumber = $phoneNumber');
+        params.phoneNumber = data.phoneNumber;
+      }
+      if (data.profilePicture !== undefined) {
+        updates.push('u.profilePicture = $profilePicture');
+        params.profilePicture = data.profilePicture;
+      }
+
+      updates.push('u.updatedAt = datetime($now)');
+
+      const result = await session.run(
+        `MATCH (u:User {id: $userId})
+         SET ${updates.join(', ')}
+         RETURN u`,
+        params
+      );
+
+      return this.nodeToUser(result.records[0].get('u'));
+    } finally {
+      await session.close();
+    }
+  }
+
+  async updateLastLogin(userId: string): Promise<void> {
+    const session = getNeo4jSession();
+    try {
+      await session.run(
+        `MATCH (u:User {id: $userId})
+         SET u.lastLogin = datetime($now), u.updatedAt = datetime($now)`,
+        { userId, now: new Date().toISOString() }
+      );
+    } finally {
+      await session.close();
+    }
+  }
+
   async updateFcmToken(userId: string, fcmToken: string): Promise<void> {
     const session = getNeo4jSession();
     try {
@@ -81,9 +169,13 @@ export class UserRepository {
       id: props.id,
       email: props.email,
       passwordHash: props.passwordHash,
+      password: props.passwordHash, // Alias
       fullName: props.fullName,
       phoneNumber: props.phoneNumber,
       fcmToken: props.fcmToken,
+      googleId: props.googleId,
+      profilePicture: props.profilePicture,
+      lastLogin: props.lastLogin ? new Date(props.lastLogin) : undefined,
       isActive: props.isActive,
       isVerified: props.isVerified,
       createdAt: new Date(props.createdAt),

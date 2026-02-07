@@ -10,6 +10,7 @@ import { logger } from './utils/logger';
 import trafficRoutes from './routes/traffic.routes';
 import predictionRoutes from './routes/prediction.routes';
 import userRoutes from './routes/user.routes';
+import authRoutes from './routes/auth.routes';
 import alertRoutes from './routes/alert.routes';
 import locationRoutes from './routes/location.routes';
 import insightRoutes from './routes/insight.routes';
@@ -61,6 +62,7 @@ class Server {
 
     // API routes
     const apiPrefix = '/api/v1';
+    this.app.use(`${apiPrefix}/auth`, authRoutes);
     this.app.use(`${apiPrefix}/traffic`, trafficRoutes);
     this.app.use(`${apiPrefix}/predictions`, predictionRoutes);
     this.app.use(`${apiPrefix}/users`, userRoutes);
@@ -129,14 +131,26 @@ server.start();
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
   await closeNeo4j();
-  await redisClient.quit();
+  try {
+    if (redisClient.status === 'ready') {
+      await redisClient.quit();
+    }
+  } catch (err) {
+    // Redis already closed
+  }
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   logger.info('SIGINT received, shutting down gracefully');
   await closeNeo4j();
-  await redisClient.quit();
+  try {
+    if (redisClient.status === 'ready') {
+      await redisClient.quit();
+    }
+  } catch (err) {
+    // Redis already closed
+  }
   process.exit(0);
 });
 
