@@ -1,5 +1,55 @@
 {
+  "name": "traffic-congestion-backend",
+  "version": "1.0.0",
+  "description": "Urban Traffic Congestion Forecasting API - PERN Stack",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typeorm": "typeorm-ts-node-commonjs"
+  },
+  "keywords": [
+    "traffic",
+    "ml",
+    "pern",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "firebase": "^12.9.0"
+    "@tensorflow/tfjs-node": "^4.17.0",
+    "@types/compression": "^1.8.1",
+    "@types/morgan": "^1.9.10",
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
+    "bull": "^4.12.2",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "firebase": "^12.9.0",
+    "firebase-admin": "^12.0.0",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.3.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "neo4j-driver": "^5.16.0",
+    "reflect-metadata": "^0.2.1",
+    "uuid": "^13.0.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bull": "^4.10.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.11.16",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

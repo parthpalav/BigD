@@ -1,3 +1,0 @@
-"""
-Endpoints Package Initialization
-"""
