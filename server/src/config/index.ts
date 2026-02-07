@@ -91,7 +91,7 @@ export const config: Config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   
   corsOrigins: process.env.CORS_ORIGINS 
-    ? JSON.parse(process.env.CORS_ORIGINS)
+    ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
     : ['http://localhost:5173', 'http://localhost:3000'],
   
   firebase: {
