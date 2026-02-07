@@ -50,17 +50,16 @@ const startServer = async () => {
   try {
     // Connect to MongoDB
     await connectDB();
-    
-    // Start listening
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🌐 API: http://localhost:${PORT}`);
-    });
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    console.warn('⚠️  MongoDB connection failed, but continuing anyway:', (error as Error).message);
   }
+  
+  // Start listening regardless of MongoDB status
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 API: http://localhost:${PORT}`);
+  });
 };
 
 startServer();
