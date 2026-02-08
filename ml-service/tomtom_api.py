@@ -1,7 +1,6 @@
 import os
 import requests
 from datetime import datetime, timedelta
-import pandas as pd
 from typing import List, Dict, Tuple
 from dotenv import load_dotenv
 
@@ -114,7 +113,7 @@ class TomTomTrafficAPI:
         route_coordinates: List[Tuple[float, float]],
         duration_hours: int = 24,
         interval_minutes: int = 15
-    ) -> pd.DataFrame:
+    ) -> List[Dict]:
         """
         Collect historical traffic data for training
         
@@ -124,7 +123,7 @@ class TomTomTrafficAPI:
             interval_minutes: Sampling interval
         
         Returns:
-            DataFrame with historical traffic patterns
+            List with historical traffic patterns
         """
         data_points = []
         end_time = datetime.now()
@@ -134,12 +133,7 @@ class TomTomTrafficAPI:
         print(f"Note: TomTom API provides real-time data only.")
         print("For historical data, you need TomTom Historical Traffic Data product.")
         
-        # In production, you would:
-        # 1. Use TomTom Historical Traffic Data API
-        # 2. Or collect and store data over time
-        # 3. Or use pre-existing datasets
-        
-        # For now, collect current data as a sample
+        # Collect current data as a sample
         for lat, lon in route_coordinates:
             traffic_data = self.get_traffic_flow(lat, lon)
             if traffic_data and 'flowSegmentData' in traffic_data:
@@ -158,7 +152,7 @@ class TomTomTrafficAPI:
                     'travel_time': flow.get('currentTravelTime', 0)
                 })
         
-        return pd.DataFrame(data_points)
+        return data_points
 
 
 def sample_route_coordinates() -> List[Tuple[float, float]]:
@@ -195,5 +189,4 @@ if __name__ == "__main__":
     # Collect sample historical data
     print("\nCollecting sample data for training...")
     df = client.collect_historical_data(coords, duration_hours=1)
-    print(f"\nCollected data:\n{df.head()}")
-    print(f"\nData shape: {df.shape}")
+    print(f"\nCollected {len(df)} data points along route")

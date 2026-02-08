@@ -14,13 +14,13 @@ tomtom_client = TomTomTrafficAPI()
 
 # Try to load existing model, otherwise train a new one
 try:
-    model.load('./models')
+    model.load('./ml-service/models')
     print("Loaded existing model")
 except:
     print("No existing model found. Training new model...")
-    df = model.generate_synthetic_training_data(n_samples=10000)
-    model.train(df)
-    model.save('./models')
+    X, y = model.generate_synthetic_training_data(n_samples=10000)
+    model.train(X, y)
+    model.save('./ml-service/models')
     print("Model trained and saved")
 
 @app.route('/health', methods=['GET'])
@@ -221,6 +221,6 @@ def retrain_model():
         }), 500
 
 if __name__ == '__main__':
-    port = int(os.getenv('ML_SERVICE_PORT', 5000))
+    port = int(os.getenv('ML_SERVICE_PORT', 5001))
     print(f"Starting ML service on port {port}...")
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

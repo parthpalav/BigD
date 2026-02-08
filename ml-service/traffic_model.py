@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -8,7 +7,6 @@ import joblib
 import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
-from tomtom_api import TomTomTrafficAPI
 
 class TrafficPredictionModel:
     """ML model for traffic congestion prediction"""
@@ -21,36 +19,22 @@ class TrafficPredictionModel:
             'lat', 'lon', 'free_flow_speed', 'historical_avg_congestion'
         ]
         
-    def create_features(self, df: pd.DataFrame) -> pd.DataFrame:
+    def create_features(self, df: np.ndarray) -> np.ndarray:
         """
         Create feature engineering for traffic prediction
         
         Args:
-            df: DataFrame with traffic data
+            df: Array with traffic data
         
         Returns:
-            DataFrame with engineered features
+            Array with engineered features
         """
         features = df.copy()
         
-        # Time-based features
-        features['is_weekend'] = features['day_of_week'].isin([5, 6]).astype(int)
-        features['is_rush_hour'] = features['hour'].isin([7, 8, 9, 17, 18, 19]).astype(int)
-        
-        # Cyclical encoding for hour (to capture 23 -> 0 transition)
-        features['hour_sin'] = np.sin(2 * np.pi * features['hour'] / 24)
-        features['hour_cos'] = np.cos(2 * np.pi * features['hour'] / 24)
-        
-        # Calculate historical average congestion by hour and location
-        if 'congestion_level' in features.columns:
-            historical_avg = features.groupby(['hour', 'lat', 'lon'])['congestion_level'].transform('mean')
-            features['historical_avg_congestion'] = historical_avg
-        else:
-            features['historical_avg_congestion'] = 50.0  # Default
-        
+        # Time-based features already included in synthetic data
         return features
     
-    def generate_synthetic_training_data(self, n_samples: int = 10000) -> pd.DataFrame:
+    def generate_synthetic_training_data(self, n_samples: int = 10000) -> np.ndarray:
         """
         Generate synthetic training data based on traffic patterns
         This is used when historical TomTom data is not available
@@ -59,17 +43,21 @@ class TrafficPredictionModel:
             n_samples: Number of samples to generate
         
         Returns:
-            DataFrame with synthetic traffic data
+            Array with synthetic traffic data [features, labels]
         """
         np.random.seed(42)
         
-        data = []
+        X = []
+        y = []
+        
         for _ in range(n_samples):
             hour = np.random.randint(0, 24)
             day_of_week = np.random.randint(0, 7)
             lat = 37.0 + np.random.random() * 1.0  # SF Bay Area
             lon = -122.5 + np.random.random() * 1.0
             free_flow_speed = 50 + np.random.random() * 30  # 50-80 km/h
+            is_weekend = int(day_of_week in [5, 6])
+            is_rush_hour = int(hour in [7, 8, 9, 17, 18, 19])
             
             # Base congestion by time of day
             if 7 <= hour <= 9:  # Morning rush
@@ -84,44 +72,29 @@ class TrafficPredictionModel:
                 base_congestion = 25 + np.random.random() * 25
             
             # Adjust for weekends (less congestion)
-            if day_of_week in [5, 6]:
+            if is_weekend:
                 base_congestion *= 0.7
+            
+            # Historical average
+            historical_avg = base_congestion
             
             # Add noise
             congestion = np.clip(base_congestion + np.random.randn() * 5, 0, 100)
             
-            # Calculate current speed based on congestion
-            current_speed = free_flow_speed * (1 - congestion / 100)
-            
-            data.append({
-                'timestamp': datetime.now() - timedelta(hours=np.random.randint(0, 720)),
-                'hour': hour,
-                'day_of_week': day_of_week,
-                'lat': lat,
-                'lon': lon,
-                'current_speed': current_speed,
-                'free_flow_speed': free_flow_speed,
-                'congestion_level': congestion,
-                'travel_time': 10 + (congestion / 10) * np.random.random()
-            })
+            X.append([hour, day_of_week, is_weekend, is_rush_hour, lat, lon, free_flow_speed, historical_avg])
+            y.append(congestion)
         
-        return pd.DataFrame(data)
+        return np.array(X), np.array(y)
     
-    def train(self, df: pd.DataFrame):
+    def train(self, X: np.ndarray, y: np.ndarray):
         """
         Train the traffic prediction model
         
         Args:
-            df: Training data with traffic patterns
+            X: Training features
+            y: Training labels (congestion)
         """
-        print(f"Training model with {len(df)} samples...")
-        
-        # Create features
-        features_df = self.create_features(df)
-        
-        # Select features for training
-        X = features_df[self.feature_names]
-        y = features_df['congestion_level']
+        print(f"Training model with {len(X)} samples...")
         
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
@@ -171,13 +144,6 @@ class TrafficPredictionModel:
             'rf': rf_model,
             'gb': gb_model
         }
-        
-        # Feature importance
-        feature_importance = pd.DataFrame({
-            'feature': self.feature_names,
-            'importance': rf_model.feature_importances_
-        }).sort_values('importance', ascending=False)
-        print(f"\nFeature Importance:\n{feature_importance}")
         
         return {
             'mse': mse,
@@ -282,18 +248,13 @@ if __name__ == "__main__":
     # Initialize model
     model = TrafficPredictionModel()
     
-    # Option 1: Use TomTom real data (if API key available)
-    # tomtom = TomTomTrafficAPI()
-    # coords = [(37.7749, -122.4194), (37.3382, -121.8863)]
-    # df = tomtom.collect_historical_data(coords, duration_hours=24)
-    
-    # Option 2: Generate synthetic training data
+    # Generate synthetic training data
     print("Generating synthetic training data...")
-    df = model.generate_synthetic_training_data(n_samples=10000)
-    print(f"Generated {len(df)} training samples\n")
+    X, y = model.generate_synthetic_training_data(n_samples=10000)
+    print(f"Generated {len(X)} training samples\n")
     
     # Train model
-    metrics = model.train(df)
+    metrics = model.train(X, y)
     
     # Save model
     model.save()
