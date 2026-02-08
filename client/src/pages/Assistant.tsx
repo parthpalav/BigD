@@ -30,6 +30,7 @@ const Assistant: React.FC = () => {
     { name: 'Home', path: '/' },
     { name: 'Traffic Map', path: '/mapview' },
     { name: 'Assistant', path: '/assistant' },
+    { name: 'News', path: '/news' },
     { name: 'About', path: '/about' },
   ];
 

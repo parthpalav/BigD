@@ -6,6 +6,7 @@ import connectDB from './config/db';
 import authRoutes from './routes/auth';
 import mlRoutes from './routes/ml';
 import chatRoutes from './routes/chat';
+import newsRoutes from './routes/news';
 
 // Load environment variables (ensure server/.env is used regardless of CWD)
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -41,7 +42,8 @@ app.get('/', (req: Request, res: Response) => {
       health: '/health',
       auth: '/api/auth',
       ml: '/api/ml',
-      chat: '/api/chat'
+      chat: '/api/chat',
+      news: '/api/news'
     }
   });
 });
@@ -57,6 +59,7 @@ app.get('/health', (req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ml', mlRoutes);
+app.use('/api/news', newsRoutes);
 app.use('/api/chat', chatRoutes);
 
 // Start server

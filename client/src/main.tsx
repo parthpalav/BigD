@@ -10,6 +10,7 @@ import Map from "./pages/Map";
 import MapView from "./pages/MapView";
 import About from "./pages/About";
 import Assistant from "./pages/Assistant";
+import News from "./pages/News";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/assistant" element={<Assistant />} />
+            <Route path="/news" element={<News />} />
             <Route path="/" element={<App />} />
             <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />
             <Route path="/mapview" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
