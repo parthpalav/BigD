@@ -62,21 +62,26 @@ const generateRoute = (
     const numSegments = Math.max(3, Math.floor(distance / 5)); // Segment every ~5km
     const segments: RouteSegment[] = [];
 
-    // Add some variation for fuel-efficient route
-    const routeVariation = routeType === 'fuel-efficient' ? 0.1 : 0.05;
-
+    // Create a smooth curve with minimal deviation
+    const routeOffset = routeType === 'fuel-efficient' ? 0.0008 : 0.0003; // Very small offset
+    
     for (let i = 0; i < numSegments; i++) {
         const progress = i / numSegments;
         const nextProgress = (i + 1) / numSegments;
 
-        // Interpolate with some randomness
+        // Create smooth segment with minimal curve
         const segmentCoords: [number, number][] = [];
-        const steps = 5;
+        const steps = 10; // More steps for smoother lines
 
         for (let j = 0; j <= steps; j++) {
             const stepProgress = progress + (nextProgress - progress) * (j / steps);
-            const lng = srcLng + (destLng - srcLng) * stepProgress + (Math.random() - 0.5) * routeVariation;
-            const lat = srcLat + (destLat - srcLat) * stepProgress + (Math.random() - 0.5) * routeVariation;
+            
+            // Add a smooth curve using sine function (much smaller amplitude)
+            const curve = Math.sin(stepProgress * Math.PI) * routeOffset;
+            
+            const lng = srcLng + (destLng - srcLng) * stepProgress;
+            const lat = srcLat + (destLat - srcLat) * stepProgress + curve;
+            
             segmentCoords.push([lng, lat]);
         }
 

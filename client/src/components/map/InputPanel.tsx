@@ -192,7 +192,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
             transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
                 position: 'absolute',
-                top: '2rem',
+                top: '5rem',
                 left: '2rem',
                 width: '380px',
                 maxHeight: 'calc(100vh - 4rem)',
