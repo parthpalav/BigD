@@ -229,7 +229,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
             <form onSubmit={handleSubmit}>
                 {/* Source Location */}
-                <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '1.5rem', position: 'relative', zIndex: 100 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                         <label style={{ ...labelStyle, marginBottom: 0 }}>Source Location</label>
                         <motion.button
@@ -253,11 +253,11 @@ const InputPanel: React.FC<InputPanelProps> = ({
                             Current
                         </motion.button>
                     </div>
-                    <div ref={sourceGeocoderRef} data-theme={theme} />
+                    <div ref={sourceGeocoderRef} data-theme={theme} style={{ position: 'relative' }} />
                 </div>
 
                 {/* Destination Location */}
-                <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '1.5rem', position: 'relative', zIndex: 99 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                         <label style={{ ...labelStyle, marginBottom: 0 }}>Destination</label>
                         <motion.button
@@ -281,7 +281,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                             Current
                         </motion.button>
                     </div>
-                    <div ref={destGeocoderRef} data-theme={theme} />
+                    <div ref={destGeocoderRef} data-theme={theme} style={{ position: 'relative' }} />
                 </div>
 
                 {/* Departure Date */}
