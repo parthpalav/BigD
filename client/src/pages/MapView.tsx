@@ -16,6 +16,7 @@ import type {
 import {
     predictTraffic,
     getRouteAtTime,
+    generateDynamicInsights,
 } from '../services/predictionService';
 import { saveSearch } from '../services/searchHistoryService';
 import type { SearchHistoryItem } from '../services/searchHistoryService';
@@ -30,6 +31,7 @@ const MapView: React.FC = () => {
     const [destinationLocation, setDestinationLocation] = useState<[number, number] | undefined>();
     const [currentRoute, setCurrentRoute] = useState<Route | null>(null);
     const [prediction, setPrediction] = useState<TrafficPrediction | null>(null);
+    const [dynamicPrediction, setDynamicPrediction] = useState<TrafficPrediction | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentHour, setCurrentHour] = useState(new Date().getHours());
     const [selectedRouteType, setSelectedRouteType] = useState<'best' | 'fuel-efficient'>('best');
@@ -59,6 +61,7 @@ const MapView: React.FC = () => {
 
             setPrediction(result);
             setCurrentRoute(result.bestRoute);
+            setDynamicPrediction(result);
             setCurrentHour(data.departureTime.getHours());
 
             // Auto-save search to history
@@ -95,6 +98,22 @@ const MapView: React.FC = () => {
 
             const newRoute = await getRouteAtTime(source, destination, hour, selectedRouteType);
             setCurrentRoute(newRoute);
+            
+            // Update dynamic insights with the new route
+            if (prediction) {
+                const fuelEfficientRoute = selectedRouteType === 'best' 
+                    ? prediction.fuelEfficientRoute 
+                    : prediction.bestRoute;
+                
+                const dynamicInsights = generateDynamicInsights(newRoute, hour, fuelEfficientRoute);
+                
+                setDynamicPrediction({
+                    ...prediction,
+                    bestRoute: selectedRouteType === 'best' ? newRoute : prediction.bestRoute,
+                    fuelEfficientRoute: selectedRouteType === 'fuel-efficient' ? newRoute : prediction.fuelEfficientRoute,
+                    insights: dynamicInsights,
+                });
+            }
         }
     };
 
@@ -104,6 +123,15 @@ const MapView: React.FC = () => {
         if (prediction) {
             const route = type === 'best' ? prediction.bestRoute : prediction.fuelEfficientRoute;
             setCurrentRoute(route);
+            
+            // Update dynamic insights for the selected route type
+            const compareRoute = type === 'best' ? prediction.fuelEfficientRoute : prediction.bestRoute;
+            const dynamicInsights = generateDynamicInsights(route, currentHour, compareRoute);
+            
+            setDynamicPrediction({
+                ...prediction,
+                insights: dynamicInsights,
+            });
         }
     };
 
@@ -123,6 +151,7 @@ const MapView: React.FC = () => {
 
             setPrediction(result);
             setCurrentRoute(result.bestRoute);
+            setDynamicPrediction(result);
             setCurrentHour(item.departureTime.getHours());
             setSelectedRouteType('best');
         } catch (error) {
@@ -391,10 +420,10 @@ const MapView: React.FC = () => {
                 }}
             >
                 {/* Insights Panel */}
-                {prediction && (
+                {dynamicPrediction && (
                     <div style={{ pointerEvents: 'auto' }}>
                         <InsightsPanel
-                            prediction={prediction}
+                            prediction={dynamicPrediction}
                             theme={theme}
                         />
                     </div>

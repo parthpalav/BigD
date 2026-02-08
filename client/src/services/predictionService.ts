@@ -122,7 +122,7 @@ const generateRoute = async (
         // Calculate congestion based on time of day and route type
         const baseCongestion = getCongestionForTime(timeOfDay);
         const congestion = routeType === 'fuel-efficient'
-            ? Math.max(0, baseCongestion - 15 + Math.random() * 10)
+            ? Math.max(0, baseCongestion - 20 + Math.random() * 10) // Lower congestion for fuel-efficient
             : baseCongestion + Math.random() * 10;
 
         const segmentDuration = calculateDuration(segmentDistance, congestion);
@@ -138,13 +138,24 @@ const generateRoute = async (
     const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
     const avgCongestion = segments.reduce((sum, seg) => sum + seg.congestionLevel, 0) / segments.length;
 
+    // Calculate fuel efficiency based on route type and congestion
+    // Fuel-efficient routes have higher score but may take longer
+    let fuelEfficiency: number;
+    if (routeType === 'fuel-efficient') {
+        // Better fuel efficiency, inversely related to congestion
+        fuelEfficiency = 85 + (100 - avgCongestion) / 10 + Math.random() * 5;
+    } else {
+        // Fastest routes less fuel efficient due to higher speeds/congestion
+        fuelEfficiency = 60 + (100 - avgCongestion) / 15 + Math.random() * 5;
+    }
+
     return {
         id: routeType,
         name: routeType === 'best' ? 'Fastest Route' : 'Fuel Efficient Route',
         segments,
         totalDistance,
         totalDuration,
-        fuelEfficiency: routeType === 'fuel-efficient' ? 85 + Math.random() * 10 : 70 + Math.random() * 10,
+        fuelEfficiency: Math.min(95, Math.max(50, fuelEfficiency)),
         avgCongestion,
     };
 };
@@ -233,7 +244,8 @@ export const predictTraffic = async (
             avgCongestion < 60 ? 'moderate' :
                 avgCongestion < 80 ? 'high' : 'severe';
 
-    const fuelSavings = ((bestRoute.totalDuration - fuelEfficientRoute.totalDuration) / bestRoute.totalDuration) * 100;
+    // Calculate actual fuel savings based on fuel efficiency scores
+    const fuelSavings = Math.max(0, fuelEfficientRoute.fuelEfficiency - bestRoute.fuelEfficiency);
 
     return {
         bestRoute,
@@ -243,7 +255,7 @@ export const predictTraffic = async (
         confidence: 85 + Math.random() * 10, // 85-95% confidence
         insights: {
             estimatedTime: Math.round(bestRoute.totalDuration),
-            fuelSavings: Math.max(0, Math.round(fuelSavings)),
+            fuelSavings: Math.round(fuelSavings),
             congestionLevel,
             peakHours: ['07:00-09:00', '17:00-19:00'],
         },
@@ -281,6 +293,33 @@ const findOptimalDate = (dateRange?: { start: Date; end: Date }): string => {
     }
 
     return dateRange.start.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+};
+
+/**
+ * Generate dynamic insights based on current route and time
+ */
+export const generateDynamicInsights = (
+    route: Route,
+    hour: number,
+    fuelEfficientRoute?: Route
+): TrafficPrediction['insights'] => {
+    const congestionLevel =
+        route.avgCongestion < 30 ? 'low' :
+            route.avgCongestion < 60 ? 'moderate' :
+                route.avgCongestion < 80 ? 'high' : 'severe';
+
+    // Calculate fuel savings if comparing with fuel-efficient route
+    let fuelSavings = 0;
+    if (fuelEfficientRoute) {
+        fuelSavings = Math.max(0, Math.round(fuelEfficientRoute.fuelEfficiency - route.fuelEfficiency));
+    }
+
+    return {
+        estimatedTime: Math.round(route.totalDuration),
+        fuelSavings,
+        congestionLevel,
+        peakHours: ['07:00-09:00', '17:00-19:00'],
+    };
 };
 
 /**
