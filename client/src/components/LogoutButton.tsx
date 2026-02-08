@@ -62,7 +62,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, style }) 
         >
           <span>👤</span>
           <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {user.fullName || user.email}
+            {user?.fullName || user?.email}
           </span>
         </motion.div>
       )}

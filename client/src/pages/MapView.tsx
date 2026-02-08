@@ -25,7 +25,7 @@ type Theme = 'light' | 'dark';
 
 const MapView: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('dark');
-    const { user, isAuthenticated } = useAuth();
+    const { user } = useAuth();
 
     const [sourceLocation, setSourceLocation] = useState<[number, number] | undefined>();
     const [destinationLocation, setDestinationLocation] = useState<[number, number] | undefined>();

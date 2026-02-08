@@ -30,8 +30,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
     const [mapLoaded, setMapLoaded] = useState(false);
     const sourceMarker = useRef<mapboxgl.Marker | null>(null);
     const destMarker = useRef<mapboxgl.Marker | null>(null);
-    const userLocationMarker = useRef<mapboxgl.Marker | null>(null);
-    const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+    // const userLocationMarker = useRef<mapboxgl.Marker | null>(null);
+    // const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
     // Initialize map
     useEffect(() => {
@@ -77,9 +77,9 @@ const MapContainer: React.FC<MapContainerProps> = ({
         });
 
         // Listen for geolocation updates
-        geolocateControl.on('geolocate', (e: any) => {
-            const userCoords: [number, number] = [e.coords.longitude, e.coords.latitude];
-            setUserLocation(userCoords);
+        geolocateControl.on('geolocate', (_e: any) => {
+            // const userCoords: [number, number] = [e.coords.longitude, e.coords.latitude];
+            // setUserLocation(userCoords);
         });
 
         return () => {

@@ -3,14 +3,13 @@ import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import LogoutButton from '../components/LogoutButton';
 
 const Map: React.FC = () => {
   const { theme, toggleTheme } = useTheme(); // Use theme from context
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  // const navigate = useNavigate();
 
   return (
     <div
