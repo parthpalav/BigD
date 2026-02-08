@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Globe from "../three/Globe";
+import HamburgerMenu from "../components/HamburgerMenu";
 
 type IntroProps = {
   theme: "dark" | "light";
@@ -34,6 +35,9 @@ export default function Intro({ theme, onToggleTheme }: IntroProps) {
       className="h-screen flex items-center justify-center overflow-hidden"
       style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
     >
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
+
       {showNav && (
         <nav
           className="fixed top-0 left-1/2 z-50 -translate-x-1/2 px-12 py-8 backdrop-blur-md"

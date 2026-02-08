@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
 import LogoutButton from '../components/LogoutButton';
+import HamburgerMenu from '../components/HamburgerMenu';
 
 interface NewsArticle {
   headline: string;
@@ -215,6 +216,9 @@ const News: React.FC = () => {
           </div>
         </motion.nav>
       </AnimatePresence>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
 
       {/* Main Content */}
       <div style={{ paddingTop: '120px', paddingBottom: '80px' }}>

@@ -5,6 +5,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import LogoutButton from '../components/LogoutButton';
+import HamburgerMenu from '../components/HamburgerMenu';
 
 const Map: React.FC = () => {
   const { theme } = useTheme(); // Use theme from context
@@ -28,6 +29,9 @@ const Map: React.FC = () => {
           <OrbitControls enableZoom={false} enablePan={false} />
         </Canvas>
       </div>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
 
       {/* Logout Button */}
       <LogoutButton />

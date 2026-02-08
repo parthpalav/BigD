@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import LogoutButton from '../components/LogoutButton';
+import HamburgerMenu from '../components/HamburgerMenu';
 import { CityScene } from '../components/about/CityScene';
 import { TrafficFlow } from '../components/about/TrafficFlow';
 import { SceneController } from '../components/about/SceneController';
@@ -81,6 +82,9 @@ const About: React.FC = () => {
           <SceneController scrollProgress={scrollProgress} focusMode={focusMode} />
         </Canvas>
       </div>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
 
       {/* Logout Button */}
       <LogoutButton />

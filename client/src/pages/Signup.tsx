@@ -6,6 +6,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import Lenis from 'lenis';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
+import HamburgerMenu from '../components/HamburgerMenu';
 
 // Theme type
 type Theme = 'light' | 'dark';
@@ -165,6 +166,9 @@ const SignupPage = () => {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
+
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
 
       {/* Three.js Background */}

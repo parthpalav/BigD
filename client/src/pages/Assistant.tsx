@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '../hooks/useTheme';
 import LogoutButton from '../components/LogoutButton';
+import HamburgerMenu from '../components/HamburgerMenu';
 import '../styles/assistant.css';
 
 interface Message {
@@ -220,6 +221,9 @@ const Assistant: React.FC = () => {
         )}
       </AnimatePresence>
 
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
+
       {/* Logout Button */}
       <LogoutButton />
 
@@ -243,12 +247,7 @@ const Assistant: React.FC = () => {
             fontWeight: 900,
             letterSpacing: '-0.04em',
             textAlign: 'center',
-            background: theme === 'dark'
-              ? 'linear-gradient(135deg, #fff 0%, #a0a0a0 100%)'
-              : '#000',
-            WebkitBackgroundClip: theme === 'dark' ? 'text' : undefined,
-            WebkitTextFillColor: theme === 'dark' ? 'transparent' : undefined,
-            backgroundClip: theme === 'dark' ? 'text' : undefined,
+            color: theme === 'dark' ? '#fff' : '#000',
           }}
         >
           ATLAS

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
+import HamburgerMenu from '../components/HamburgerMenu';
 
 interface GoogleCallbackResponse {
   credential: string;
@@ -107,6 +108,9 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-black p-4">
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
+
       {/* Theme Toggle Button */}
       <motion.button
         onClick={toggleTheme}

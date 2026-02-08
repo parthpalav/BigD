@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
+import HamburgerMenu from '../components/HamburgerMenu';
 import MapContainer from '../components/map/MapContainer';
 import InputPanel from '../components/map/InputPanel';
 import InsightsPanel from '../components/map/InsightsPanel';
@@ -174,6 +175,9 @@ const MapView: React.FC = () => {
                 transition: 'background 0.5s ease',
             }}
         >
+            {/* Hamburger Menu */}
+            <HamburgerMenu />
+
             {/* Map Container - Base Layer */}
             <MapContainer
                 sourceLocation={sourceLocation}
