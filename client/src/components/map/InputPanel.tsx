@@ -135,10 +135,60 @@ const InputPanel: React.FC<InputPanelProps> = ({
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const getGeocoderInputValue = (geocoder: any): string => {
+        if (!geocoder) return '';
+        if (typeof geocoder.getInput === 'function') {
+            return geocoder.getInput().trim();
+        }
+        const inputEl = (geocoder as any)._inputEl as HTMLInputElement | undefined;
+        return inputEl?.value?.trim() || '';
+    };
+
+    const geocodeQuery = async (query: string): Promise<Location | null> => {
+        if (!query || !mapboxgl.accessToken) return null;
+
+        try {
+            const response = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?limit=1&access_token=${mapboxgl.accessToken}`
+            );
+            if (!response.ok) return null;
+
+            const data = await response.json();
+            const result = data?.features?.[0];
+            if (!result?.center) return null;
+
+            return {
+                name: result.place_name || query,
+                coordinates: result.center,
+            };
+        } catch {
+            return null;
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!source || !destination) {
+        let resolvedSource = source;
+        let resolvedDestination = destination;
+
+        if (!resolvedSource) {
+            const sourceQuery = getGeocoderInputValue(sourceGeocoderInstance.current);
+            resolvedSource = await geocodeQuery(sourceQuery);
+            if (resolvedSource) {
+                setSource(resolvedSource);
+            }
+        }
+
+        if (!resolvedDestination) {
+            const destQuery = getGeocoderInputValue(destGeocoderInstance.current);
+            resolvedDestination = await geocodeQuery(destQuery);
+            if (resolvedDestination) {
+                setDestination(resolvedDestination);
+            }
+        }
+
+        if (!resolvedSource || !resolvedDestination) {
             alert('Please fill in all required fields');
             return;
         }
@@ -166,8 +216,8 @@ const InputPanel: React.FC<InputPanelProps> = ({
         }
 
         const data: any = {
-            source,
-            destination,
+            source: resolvedSource,
+            destination: resolvedDestination,
             departureTime: departureDateTime,
         };
 

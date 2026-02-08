@@ -2,8 +2,13 @@
 // Uses Mapbox Directions API + ML model for traffic predictions
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const ML_DIRECT_URL = import.meta.env.VITE_ML_SERVICE_URL || 'http://localhost:5001';
 const USE_ML_MODEL = import.meta.env.VITE_USE_ML_MODEL === 'true';
+
+let mlServiceDown = false;
+let mlFallbackUsedInRun = false;
+const fallbackPredictionCache = new Map<string, TrafficPrediction>();
 
 export interface Location {
     name: string;
@@ -166,11 +171,14 @@ const generateRoute = async (
     // Fastest routes: highway speeds = worse fuel economy
     let fuelEfficiency: number;
     if (routeType === 'fuel-efficient') {
-        // Base 80-90%, bonus for low congestion (smooth driving)
-        fuelEfficiency = 80 + Math.random() * 10 + (100 - avgCongestion) / 20;
+        // Base 82%, bonus for low congestion (smooth driving saves fuel)
+        // Range: 82-92% depending on congestion
+        fuelEfficiency = 82 + (100 - avgCongestion) / 10;
     } else {
-        // Base 55-70%, slight bonus for low congestion
-        fuelEfficiency = 55 + Math.random() * 15 + (100 - avgCongestion) / 30;
+        // Base 60%, slight bonus for low congestion
+        // Range: 60-70% depending on congestion
+        // Always lower than fuel-efficient route to ensure savings
+        fuelEfficiency = 60 + (100 - avgCongestion) / 15;
     }
 
     return {
@@ -195,26 +203,51 @@ const getMLCongestionPrediction = async (
     try {
         const now = new Date();
         const dayOfWeek = now.getDay(); // 0=Sunday, 6=Saturday
-        
-        const response = await fetch(`${API_URL}/api/ml/predict`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                hour,
-                day_of_week: dayOfWeek,
-                lat,
-                lon,
-                free_flow_speed: 60
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('ML prediction failed');
+        const requestBody = {
+            hour,
+            day_of_week: dayOfWeek,
+            lat,
+            lon,
+            free_flow_speed: 60,
+        };
+
+        const parsePrediction = (data: any): number => {
+            const prediction = data?.data?.prediction ?? data?.prediction;
+            if (prediction?.congestion === undefined || prediction?.congestion === null) {
+                throw new Error('ML prediction missing congestion value');
+            }
+            return prediction.congestion;
+        };
+
+        const fetchPrediction = async (endpoint: string): Promise<number> => {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                const responseText = await response.text().catch(() => '');
+                throw new Error(`ML prediction failed (${response.status}): ${responseText}`);
+            }
+
+            const data = await response.json();
+            return parsePrediction(data);
+        };
+
+        try {
+            const congestion = await fetchPrediction(`${API_URL}/api/ml/predict`);
+            mlServiceDown = false;
+            return congestion;
+        } catch (backendError) {
+            console.warn('Backend ML proxy failed, retrying direct ML service:', backendError);
+            const congestion = await fetchPrediction(`${ML_DIRECT_URL}/predict`);
+            mlServiceDown = false;
+            return congestion;
         }
-        
-        const data = await response.json();
-        return data.data.prediction.congestion;
     } catch (error) {
+        mlServiceDown = true;
+        mlFallbackUsedInRun = true;
         console.warn('ML prediction failed, falling back to rule-based:', error);
         return getCongestionForTime(hour);
     }
@@ -263,6 +296,62 @@ const toRad = (degrees: number): number => {
     return degrees * (Math.PI / 180);
 };
 
+const formatCoord = (value: number): string => value.toFixed(5);
+
+const buildPredictionCacheKey = (
+    source: Location,
+    destination: Location,
+    departureTime: Date,
+    dateRange?: { start: Date; end: Date }
+): string => {
+    const src = `${formatCoord(source.coordinates[0])},${formatCoord(source.coordinates[1])}`;
+    const dst = `${formatCoord(destination.coordinates[0])},${formatCoord(destination.coordinates[1])}`;
+    const timeKey = departureTime.toISOString();
+    const rangeKey = dateRange
+        ? `${dateRange.start.toISOString()}-${dateRange.end.toISOString()}`
+        : 'no-range';
+    return `${src}|${dst}|${timeKey}|${rangeKey}`;
+};
+
+const hashStringToRange = (input: string, min: number, max: number): number => {
+    let hash = 0;
+    for (let i = 0; i < input.length; i += 1) {
+        hash = (hash << 5) - hash + input.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    const normalized = Math.abs(hash) % 1000; // 0-999
+    return min + (normalized / 999) * (max - min);
+};
+
+const checkMlServiceAvailable = async (): Promise<boolean> => {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 1500);
+
+    const check = async (url: string): Promise<boolean> => {
+        try {
+            const response = await fetch(url, { signal: controller.signal });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    };
+
+    try {
+        if (await check(`${API_URL}/api/ml/health`)) {
+            mlServiceDown = false;
+            return true;
+        }
+        if (await check(`${ML_DIRECT_URL}/health`)) {
+            mlServiceDown = false;
+            return true;
+        }
+        mlServiceDown = true;
+        return false;
+    } finally {
+        window.clearTimeout(timeoutId);
+    }
+};
+
 /**
  * Main prediction function
  */
@@ -272,6 +361,16 @@ export const predictTraffic = async (
     departureTime: Date,
     dateRange?: { start: Date; end: Date }
 ): Promise<TrafficPrediction> => {
+    const cacheKey = buildPredictionCacheKey(source, destination, departureTime, dateRange);
+
+    if (mlServiceDown && fallbackPredictionCache.has(cacheKey)) {
+        const mlAvailable = await checkMlServiceAvailable();
+        if (!mlAvailable) {
+            return fallbackPredictionCache.get(cacheKey)!;
+        }
+    }
+
+    mlFallbackUsedInRun = false;
     const hour = departureTime.getHours();
 
     // Generate both routes (now async with Mapbox API)
@@ -319,13 +418,13 @@ export const predictTraffic = async (
     // Calculate actual fuel savings based on fuel efficiency scores
     const fuelSavings = Math.max(0, fuelEfficientRoute.fuelEfficiency - bestRoute.fuelEfficiency);
 
-    return {
+    const prediction: TrafficPrediction = {
         bestRoute,
         fuelEfficientRoute,
         optimalDepartureTime,
         optimalDate,
         usedDateRange: !!dateRange, // True if date range was provided
-        confidence: 85 + Math.random() * 10, // 85-95% confidence
+        confidence: hashStringToRange(cacheKey, 85, 95), // 85-95% deterministic confidence
         insights: {
             estimatedTime: Math.round(bestRoute.totalDuration),
             fuelSavings: Math.round(fuelSavings),
@@ -333,6 +432,14 @@ export const predictTraffic = async (
             peakHours: ['07:00-09:00', '17:00-19:00'],
         },
     };
+
+    if (mlFallbackUsedInRun) {
+        fallbackPredictionCache.set(cacheKey, prediction);
+    } else if (fallbackPredictionCache.has(cacheKey)) {
+        fallbackPredictionCache.delete(cacheKey);
+    }
+
+    return prediction;
 };
 
 /**

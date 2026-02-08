@@ -1,13 +1,14 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import connectDB from './config/db';
 import authRoutes from './routes/auth';
 import mlRoutes from './routes/ml';
 import chatRoutes from './routes/chat';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables (ensure server/.env is used regardless of CWD)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Initialize Express app
 const app: Application = express();
