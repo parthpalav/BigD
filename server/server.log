@@ -1,0 +1,10 @@
+✅ MongoDB connected
+🚀 Server running on port 3001
+📝 Environment: development
+🌐 API: http://localhost:3001
+🤖 Sending message to AI: What is traffic like in Mumbai?...
+✅ AI response received
+❌ OpenAI API call failed: API call timeout after 15 seconds
+🤖 Sending message to AI: What is traffic like?...
+✅ AI response received
+❌ OpenAI API call failed: API call timeout after 15 seconds
