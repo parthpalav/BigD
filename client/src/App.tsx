@@ -6,6 +6,7 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import Lenis from 'lenis';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
+import LogoutButton from './components/LogoutButton';
 import './index.css';
 
 // Theme type
@@ -176,6 +177,8 @@ const HamburgerMenu = ({ theme }: { theme: Theme }) => {
 
 // Theme Toggle Button Component
 const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => void }) => {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <motion.button
       onClick={toggleTheme}
@@ -184,7 +187,7 @@ const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => 
       style={{
         position: 'fixed',
         top: '2rem',
-        right: '2rem',
+        right: isAuthenticated ? '22rem' : '2rem', // Adjust position when logged in
         width: '50px',
         height: '50px',
         borderRadius: '50%',
@@ -1227,6 +1230,7 @@ function App() {
       transition: 'background 0.5s ease'
     }}>
       <HamburgerMenu theme={theme} />
+      <LogoutButton />
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
       <NavigationBar showNav={showNav} theme={theme} />
       <Hero onExploreClick={handleExploreClick} theme={theme} />

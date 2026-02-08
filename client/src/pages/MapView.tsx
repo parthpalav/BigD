@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import LogoutButton from '../components/LogoutButton';
 import MapContainer from '../components/map/MapContainer';
 import InputPanel from '../components/map/InputPanel';
 import InsightsPanel from '../components/map/InsightsPanel';
@@ -24,7 +25,7 @@ type Theme = 'light' | 'dark';
 
 const MapView: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('dark');
-    const { user, logout } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
     const [sourceLocation, setSourceLocation] = useState<[number, number] | undefined>();
@@ -38,11 +39,6 @@ const MapView: React.FC = () => {
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
-    };
-
-    const handleLogout = () => {
-        logout();
-        navigate('/');
     };
 
     const handlePredictionSubmit = async (data: {
@@ -257,6 +253,9 @@ const MapView: React.FC = () => {
                 </motion.div>
             )}
 
+            {/* Logout Button */}
+            <LogoutButton />
+
             {/* History Toggle */}
             <motion.button
                 onClick={() => setShowHistory(!showHistory)}
@@ -265,7 +264,7 @@ const MapView: React.FC = () => {
                 style={{
                     position: 'fixed',
                     top: '2rem',
-                    right: '470px',
+                    right: isAuthenticated ? '26rem' : '7rem',
                     width: '50px',
                     height: '50px',
                     borderRadius: '50%',
@@ -297,7 +296,7 @@ const MapView: React.FC = () => {
                 style={{
                     position: 'fixed',
                     top: '2rem',
-                    right: '400px',
+                    right: isAuthenticated ? '22rem' : '2rem',
                     width: '50px',
                     height: '50px',
                     borderRadius: '50%',
@@ -319,30 +318,6 @@ const MapView: React.FC = () => {
                 <span style={{ fontSize: '1.5rem' }}>
                     {theme === 'dark' ? '☀️' : '🌙'}
                 </span>
-            </motion.button>
-
-            {/* Logout Button */}
-            <motion.button
-                onClick={handleLogout}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                    position: 'fixed',
-                    bottom: '2rem',
-                    left: '2rem',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '0.75rem',
-                    background: 'rgba(239, 68, 68, 0.9)',
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    zIndex: 100,
-                    fontWeight: 600,
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 16px rgba(239, 68, 68, 0.4)',
-                }}
-            >
-                ← Logout
             </motion.button>
 
             {/* Branding */}

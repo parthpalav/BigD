@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
+import { useAuth } from '../hooks/useAuth';
+import LogoutButton from '../components/LogoutButton';
 import { CityScene } from '../components/about/CityScene';
 import { TrafficFlow } from '../components/about/TrafficFlow';
 import { SceneController } from '../components/about/SceneController';
@@ -10,6 +12,7 @@ import { ScrollSections } from '../components/about/ScrollSections';
 
 const About: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [focusMode, setFocusMode] = useState<'commercial' | 'private' | 'intelligence' | 'default'>('default');
 
@@ -73,6 +76,9 @@ const About: React.FC = () => {
         </Canvas>
       </div>
 
+      {/* Logout Button */}
+      <LogoutButton />
+
       {/* Theme Toggle */}
       <motion.button
         onClick={toggleTheme}
@@ -81,7 +87,7 @@ const About: React.FC = () => {
         style={{
           position: 'fixed',
           top: '2rem',
-          right: '2rem',
+          right: isAuthenticated ? '22rem' : '2rem',
           width: '50px',
           height: '50px',
           borderRadius: '50%',

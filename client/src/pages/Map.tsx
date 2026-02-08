@@ -5,16 +5,12 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
+import LogoutButton from '../components/LogoutButton';
 
 const Map: React.FC = () => {
   const { theme, toggleTheme } = useTheme(); // Use theme from context
-  const { user, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   return (
     <div
@@ -34,6 +30,9 @@ const Map: React.FC = () => {
         </Canvas>
       </div>
 
+      {/* Logout Button */}
+      <LogoutButton />
+
       {/* Theme Toggle */}
       <motion.button
         onClick={toggleTheme}
@@ -42,7 +41,7 @@ const Map: React.FC = () => {
         style={{
           position: 'fixed',
           top: '2rem',
-          right: '2rem',
+          right: isAuthenticated ? '22rem' : '2rem',
           width: '50px',
           height: '50px',
           borderRadius: '50%',
@@ -64,29 +63,6 @@ const Map: React.FC = () => {
         <span style={{ fontSize: '1.5rem' }}>
           {theme === 'dark' ? '☀️' : '🌙'}
         </span>
-      </motion.button>
-
-      {/* Logout Button */}
-      <motion.button
-        onClick={handleLogout}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        style={{
-          position: 'fixed',
-          top: '2rem',
-          left: '2rem',
-          padding: '0.75rem 1.5rem',
-          borderRadius: '0.5rem',
-          background: 'rgba(239, 68, 68, 0.8)',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-          zIndex: 100,
-          fontWeight: 600,
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        Logout
       </motion.button>
 
       {/* Content */}
