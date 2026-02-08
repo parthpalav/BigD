@@ -32,6 +32,8 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
     const sourceGeocoderRef = useRef<HTMLDivElement>(null);
     const destGeocoderRef = useRef<HTMLDivElement>(null);
+    const sourceGeocoderInstance = useRef<any>(null);
+    const destGeocoderInstance = useRef<any>(null);
     const [userProximity, setUserProximity] = useState<[number, number] | null>(null);
 
     // Get user's location for proximity-based suggestions
@@ -48,44 +50,44 @@ const InputPanel: React.FC<InputPanelProps> = ({
         }
     }, []);
 
-    // Initialize geocoders
+    // Initialize geocoders once
     useEffect(() => {
         if (!sourceGeocoderRef.current || !destGeocoderRef.current) return;
+        if (sourceGeocoderInstance.current || destGeocoderInstance.current) return; // Prevent duplicate initialization
 
         const geocoderOptions: any = {
             accessToken: mapboxgl.accessToken,
             mapboxgl: mapboxgl as any,
-            countries: 'us,in,gb,ca,au', // Focus on major countries
-            types: 'place,address,poi,locality,neighborhood', // Include points of interest
-            limit: 8, // Show more suggestions
+            countries: 'us,in,gb,ca,au',
+            types: 'place,address,poi,locality,neighborhood',
+            limit: 8,
         };
 
-        // Add proximity if user location is available
         if (userProximity) {
             geocoderOptions.proximity = userProximity;
         }
 
-        const sourceGeocoder = new MapboxGeocoder({
+        sourceGeocoderInstance.current = new MapboxGeocoder({
             ...geocoderOptions,
             placeholder: '📍 Enter source location...',
         });
 
-        const destGeocoder = new MapboxGeocoder({
+        destGeocoderInstance.current = new MapboxGeocoder({
             ...geocoderOptions,
             placeholder: '🎯 Enter destination...',
         });
 
-        sourceGeocoder.addTo(sourceGeocoderRef.current);
-        destGeocoder.addTo(destGeocoderRef.current);
+        sourceGeocoderInstance.current.addTo(sourceGeocoderRef.current);
+        destGeocoderInstance.current.addTo(destGeocoderRef.current);
 
-        sourceGeocoder.on('result', (e: any) => {
+        sourceGeocoderInstance.current.on('result', (e: any) => {
             setSource({
                 name: e.result.place_name,
                 coordinates: e.result.center,
             });
         });
 
-        destGeocoder.on('result', (e: any) => {
+        destGeocoderInstance.current.on('result', (e: any) => {
             setDestination({
                 name: e.result.place_name,
                 coordinates: e.result.center,
@@ -93,10 +95,41 @@ const InputPanel: React.FC<InputPanelProps> = ({
         });
 
         return () => {
-            sourceGeocoder.clear();
-            destGeocoder.clear();
+            if (sourceGeocoderInstance.current) {
+                sourceGeocoderInstance.current.clear();
+                sourceGeocoderInstance.current = null;
+            }
+            if (destGeocoderInstance.current) {
+                destGeocoderInstance.current.clear();
+                destGeocoderInstance.current = null;
+            }
         };
     }, [userProximity]);
+
+    // Handle use current location
+    const useCurrentLocation = (type: 'source' | 'destination') => {
+        if (!userProximity) {
+            alert('Please enable location access to use this feature');
+            return;
+        }
+
+        const location: Location = {
+            name: 'Current Location',
+            coordinates: userProximity,
+        };
+
+        if (type === 'source') {
+            setSource(location);
+            if (sourceGeocoderInstance.current) {
+                sourceGeocoderInstance.current.setInput('Current Location');
+            }
+        } else {
+            setDestination(location);
+            if (destGeocoderInstance.current) {
+                destGeocoderInstance.current.setInput('Current Location');
+            }
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -193,13 +226,57 @@ const InputPanel: React.FC<InputPanelProps> = ({
             <form onSubmit={handleSubmit}>
                 {/* Source Location */}
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={labelStyle}>Source Location</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <label style={{ ...labelStyle, marginBottom: 0 }}>Source Location</label>
+                        <motion.button
+                            type="button"
+                            onClick={() => useCurrentLocation('source')}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                padding: '0.25rem 0.5rem',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                border: 'none',
+                                borderRadius: '0.375rem',
+                                color: 'white',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                            }}
+                        >
+                            📍 Current
+                        </motion.button>
+                    </div>
                     <div ref={sourceGeocoderRef} />
                 </div>
 
                 {/* Destination Location */}
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={labelStyle}>Destination</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <label style={{ ...labelStyle, marginBottom: 0 }}>Destination</label>
+                        <motion.button
+                            type="button"
+                            onClick={() => useCurrentLocation('destination')}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                padding: '0.25rem 0.5rem',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                border: 'none',
+                                borderRadius: '0.375rem',
+                                color: 'white',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                            }}
+                        >
+                            📍 Current
+                        </motion.button>
+                    </div>
                     <div ref={destGeocoderRef} />
                 </div>
 
