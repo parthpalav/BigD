@@ -163,7 +163,7 @@ const MapView: React.FC = () => {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '1rem 1.5rem',
+                    padding: '0.75rem 1rem',
                     background: theme === 'dark' 
                         ? 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)'
                         : 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
@@ -203,7 +203,7 @@ const MapView: React.FC = () => {
                 </motion.div>
 
                 {/* Right Controls */}
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     {/* User Info */}
                     {user && (
                         <motion.div
@@ -379,10 +379,12 @@ const MapView: React.FC = () => {
                     right: 0,
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '1rem',
-                    padding: '0 1.5rem 1.5rem',
+                    gap: '0.75rem',
+                    padding: '0 1.5rem 1rem',
                     pointerEvents: 'none',
                     zIndex: 80,
+                    maxHeight: '60vh',
+                    overflow: 'hidden',
                 }}
             >
                 {/* Insights Panel */}

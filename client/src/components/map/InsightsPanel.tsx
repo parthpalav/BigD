@@ -51,36 +51,34 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
         background: theme === 'dark' ? 'rgba(30, 30, 30, 0.8)' : 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(20px)',
         border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
-        borderRadius: '1rem',
-        padding: '1.5rem',
+        borderRadius: '0.75rem',
+        padding: '1rem',
         transition: 'all 0.3s ease',
     };
 
     return (
         <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
-                position: 'absolute',
-                top: '2rem',
-                right: '2rem',
-                width: '350px',
-                maxHeight: 'calc(100vh - 4rem)',
+                width: '100%',
+                maxWidth: '700px',
+                margin: '0 auto',
+                maxHeight: 'calc(40vh)',
                 overflowY: 'auto',
-                zIndex: 10,
             }}
         >
             {/* Header */}
             <div
                 style={{
                     ...cardStyle,
-                    marginBottom: '1rem',
+                    marginBottom: '0.75rem',
                 }}
             >
                 <h3
                     style={{
-                        fontSize: '1.25rem',
+                        fontSize: '1rem',
                         fontWeight: 700,
                         color: theme === 'dark' ? 'white' : '#1a1a1a',
                         marginBottom: '0.5rem',
@@ -126,7 +124,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
                 ref={(el) => { cardsRef.current[0] = el; }}
                 style={{
                     ...cardStyle,
-                    marginBottom: '1rem',
+                    marginBottom: '0.75rem',
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
@@ -148,7 +146,7 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
                 ref={(el) => { cardsRef.current[1] = el; }}
                 style={{
                     ...cardStyle,
-                    marginBottom: '1rem',
+                    marginBottom: '0.75rem',
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
