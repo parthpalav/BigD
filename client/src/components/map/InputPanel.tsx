@@ -253,7 +253,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                             Current
                         </motion.button>
                     </div>
-                    <div ref={sourceGeocoderRef} />
+                    <div ref={sourceGeocoderRef} data-theme={theme} />
                 </div>
 
                 {/* Destination Location */}
@@ -281,7 +281,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                             Current
                         </motion.button>
                     </div>
-                    <div ref={destGeocoderRef} />
+                    <div ref={destGeocoderRef} data-theme={theme} />
                 </div>
 
                 {/* Departure Date */}
