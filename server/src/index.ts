@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db';
 import authRoutes from './routes/auth';
 import mlRoutes from './routes/ml';
+import chatRoutes from './routes/chat';
 
 // Load environment variables
 dotenv.config();
@@ -38,7 +39,8 @@ app.get('/', (req: Request, res: Response) => {
     endpoints: {
       health: '/health',
       auth: '/api/auth',
-      ml: '/api/ml'
+      ml: '/api/ml',
+      chat: '/api/chat'
     }
   });
 });
@@ -54,6 +56,7 @@ app.get('/health', (req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ml', mlRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Start server
 const startServer = async () => {
