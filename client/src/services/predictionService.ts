@@ -1,7 +1,9 @@
 // ML Prediction Service for ORION Traffic Intelligence Platform
-// Uses Mapbox Directions API for real road routes
+// Uses Mapbox Directions API + ML model for traffic predictions
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const USE_ML_MODEL = import.meta.env.VITE_USE_ML_MODEL === 'true';
 
 export interface Location {
     name: string;
@@ -121,7 +123,13 @@ const generateRoute = async (
         }
 
         // Calculate congestion based on time of day and route type
-        const baseCongestion = getCongestionForTime(timeOfDay);
+        const baseCongestion = USE_ML_MODEL 
+            ? await getMLCongestionPrediction(
+                segmentCoords[0][1], // lat
+                segmentCoords[0][0], // lon
+                timeOfDay
+              )
+            : getCongestionForTime(timeOfDay);
         
         let congestion: number;
         let adjustedSpeed: number; // km/h
@@ -177,7 +185,44 @@ const generateRoute = async (
 };
 
 /**
+ * Get ML-based congestion prediction from backend
+ */
+const getMLCongestionPrediction = async (
+    lat: number,
+    lon: number,
+    hour: number
+): Promise<number> => {
+    try {
+        const now = new Date();
+        const dayOfWeek = now.getDay(); // 0=Sunday, 6=Saturday
+        
+        const response = await fetch(`${API_URL}/api/ml/predict`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                hour,
+                day_of_week: dayOfWeek,
+                lat,
+                lon,
+                free_flow_speed: 60
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('ML prediction failed');
+        }
+        
+        const data = await response.json();
+        return data.data.prediction.congestion;
+    } catch (error) {
+        console.warn('ML prediction failed, falling back to rule-based:', error);
+        return getCongestionForTime(hour);
+    }
+};
+
+/**
  * Calculate congestion level based on time of day (0-23)
+ * Used as fallback when ML model is unavailable
  */
 const getCongestionForTime = (hour: number): number => {
     // Morning rush: 7-9 AM
