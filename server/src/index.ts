@@ -17,7 +17,9 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:3000',
     'https://orion-81736.web.app',
-    'https://orion-81736.firebaseapp.com'
+    'https://orion-81736.firebaseapp.com',
+    'https://orionmaps.xyz',
+    'https://www.orionmaps.xyz'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
