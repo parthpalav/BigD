@@ -221,11 +221,21 @@ const Assistant: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Hamburger Menu */}
-      <HamburgerMenu />
-
-      {/* Logout Button */}
-      <LogoutButton />
+      {/* Top Right Controls - Hamburger Menu & Logout Button */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '2rem',
+          right: '2rem',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+        }}
+      >
+        <HamburgerMenu style={{ position: 'static', top: 'auto', left: 'auto' }} />
+        <LogoutButton style={{ position: 'static', top: 'auto', right: 'auto' }} />
+      </div>
 
       {/* SECTION 1: Hero/Landing */}
       <section
@@ -250,7 +260,13 @@ const Assistant: React.FC = () => {
             color: theme === 'dark' ? '#fff' : '#000',
           }}
         >
-          ATLAS
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.1em' }}>
+            A
+            <svg width="0.8em" height="0.8em" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+              <path d="M57.043 24.593C54.027 17.379 44.758 8.687 44.758 8.687s2.994 7.435.826 17.266l3.51-3.038s3.342 1.434 3.717 4.958c.467 4.355-2.029 10.567-2.029 10.567s-5.506-1.738-13.92-1.617l-3.01-19.583l7.154 4.69L32 2l-9.009 19.93l7.157-4.69l-3.01 19.583c-8.416-.121-13.922 1.617-13.922 1.617s-2.494-6.212-2.028-10.567c.375-3.524 3.715-4.958 3.715-4.958l3.511 3.038c-2.168-9.832.826-17.266.826-17.266S9.97 17.379 6.955 24.593C3.858 32 2 40.818 2 40.818l6.399 5.914s5.649-1.664 9.963-1.998c4.129-.318 8.93-.398 8.93-.398l-.618 8.711L32 62l5.326-8.953l-.621-8.711s4.801.08 8.93.398c4.314.334 9.963 1.998 9.963 1.998L62 40.818S60.141 32 57.043 24.593" fill="currentColor"></path>
+            </svg>
+            LAS
+          </span>
         </motion.h1>
 
         {/* Scroll Indicator */}
@@ -359,7 +375,13 @@ const Assistant: React.FC = () => {
             e.currentTarget.style.color = theme === 'dark' ? '#fff' : '#000';
           }}
         >
-          ATLAS
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.05em' }}>
+            A
+            <svg width="0.8em" height="0.8em" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+              <path d="M57.043 24.593C54.027 17.379 44.758 8.687 44.758 8.687s2.994 7.435.826 17.266l3.51-3.038s3.342 1.434 3.717 4.958c.467 4.355-2.029 10.567-2.029 10.567s-5.506-1.738-13.92-1.617l-3.01-19.583l7.154 4.69L32 2l-9.009 19.93l7.157-4.69l-3.01 19.583c-8.416-.121-13.922 1.617-13.922 1.617s-2.494-6.212-2.028-10.567c.375-3.524 3.715-4.958 3.715-4.958l3.511 3.038c-2.168-9.832.826-17.266.826-17.266S9.97 17.379 6.955 24.593C3.858 32 2 40.818 2 40.818l6.399 5.914s5.649-1.664 9.963-1.998c4.129-.318 8.93-.398 8.93-.398l-.618 8.711L32 62l5.326-8.953l-.621-8.711s4.801.08 8.93.398c4.314.334 9.963 1.998 9.963 1.998L62 40.818S60.141 32 57.043 24.593" fill="currentColor"></path>
+            </svg>
+            LAS
+          </span>
         </motion.div>
 
         <div
@@ -406,8 +428,12 @@ const Assistant: React.FC = () => {
                     }}
                   >
                     {message.role === 'assistant' && (
-                      <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem' }}>
-                        ATLAS
+                      <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.05em' }}>
+                        A
+                        <svg width="0.8em" height="0.8em" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                          <path d="M57.043 24.593C54.027 17.379 44.758 8.687 44.758 8.687s2.994 7.435.826 17.266l3.51-3.038s3.342 1.434 3.717 4.958c.467 4.355-2.029 10.567-2.029 10.567s-5.506-1.738-13.92-1.617l-3.01-19.583l7.154 4.69L32 2l-9.009 19.93l7.157-4.69l-3.01 19.583c-8.416-.121-13.922 1.617-13.922 1.617s-2.494-6.212-2.028-10.567c.375-3.524 3.715-4.958 3.715-4.958l3.511 3.038c-2.168-9.832.826-17.266.826-17.266S9.97 17.379 6.955 24.593C3.858 32 2 40.818 2 40.818l6.399 5.914s5.649-1.664 9.963-1.998c4.129-.318 8.93-.398 8.93-.398l-.618 8.711L32 62l5.326-8.953l-.621-8.711s4.801.08 8.93.398c4.314.334 9.963 1.998 9.963 1.998L62 40.818S60.141 32 57.043 24.593" fill="currentColor"></path>
+                        </svg>
+                        LAS
                       </div>
                     )}
                     {message.role === 'assistant' ? (
@@ -477,8 +503,12 @@ const Assistant: React.FC = () => {
                       color: theme === 'dark' ? '#fff' : '#000',
                     }}
                   >
-                    <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem' }}>
-                      ATLAS
+                    <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.05em' }}>
+                      A
+                      <svg width="0.8em" height="0.8em" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                        <path d="M57.043 24.593C54.027 17.379 44.758 8.687 44.758 8.687s2.994 7.435.826 17.266l3.51-3.038s3.342 1.434 3.717 4.958c.467 4.355-2.029 10.567-2.029 10.567s-5.506-1.738-13.92-1.617l-3.01-19.583l7.154 4.69L32 2l-9.009 19.93l7.157-4.69l-3.01 19.583c-8.416-.121-13.922 1.617-13.922 1.617s-2.494-6.212-2.028-10.567c.375-3.524 3.715-4.958 3.715-4.958l3.511 3.038c-2.168-9.832.826-17.266.826-17.266S9.97 17.379 6.955 24.593C3.858 32 2 40.818 2 40.818l6.399 5.914s5.649-1.664 9.963-1.998c4.129-.318 8.93-.398 8.93-.398l-.618 8.711L32 62l5.326-8.953l-.621-8.711s4.801.08 8.93.398c4.314.334 9.963 1.998 9.963 1.998L62 40.818S60.141 32 57.043 24.593" fill="currentColor"></path>
+                      </svg>
+                      LAS
                     </div>
                     Thinking...
                   </div>

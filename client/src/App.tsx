@@ -1297,18 +1297,21 @@ function App() {
   // Handle hash-based navigation (e.g., /#login from protected routes)
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash === '#login') {
+    const state = location.state as { redirectToLogin?: boolean } | null;
+    
+    // Scroll to login if hash is #login OR if redirected from protected route
+    if (hash === '#login' || state?.redirectToLogin) {
       // Small delay to ensure DOM is ready
       setTimeout(() => {
         const loginSection = document.getElementById('login');
         if (loginSection) {
           loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          // Clear the hash from URL after scrolling
-          window.history.replaceState(null, '', window.location.pathname);
+          // Clear the hash and state from URL after scrolling
+          window.history.replaceState({}, '', window.location.pathname);
         }
       }, 100);
     }
-  }, []);
+  }, [location.state]);
 
   // Handle nav visibility based on scroll
   useEffect(() => {

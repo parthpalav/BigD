@@ -19,8 +19,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    // Redirect to home page and scroll to login section
-    return <Navigate to="/#login" replace state={{ from: location }} />;
+    // Redirect to home page with flag to scroll to login section
+    return <Navigate to="/" replace state={{ from: location, redirectToLogin: true }} />;
   }
 
   return <>{children}</>;

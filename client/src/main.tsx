@@ -20,12 +20,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <ThemeProvider>
         <AuthProvider>
           <Routes>
+            {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/assistant" element={<Assistant />} />
-            <Route path="/news" element={<News />} />
             <Route path="/" element={<App />} />
+            <Route path="/about" element={<About />} />
+            
+            {/* Protected routes - require authentication */}
+            <Route path="/assistant" element={<ProtectedRoute><Assistant /></ProtectedRoute>} />
+            <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
             <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />
             <Route path="/mapview" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
           </Routes>

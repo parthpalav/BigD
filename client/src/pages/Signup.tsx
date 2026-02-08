@@ -59,7 +59,7 @@ const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => 
 
 const SignupPage = () => {
   const { theme, toggleTheme } = useTheme(); // Use theme from context
-  const { register } = useAuth();
+  const { register, isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +73,13 @@ const SignupPage = () => {
     password: '',
     confirmPassword: '',
   });
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   useEffect(() => {
     // Initialize smooth scrolling

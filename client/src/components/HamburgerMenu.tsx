@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../hooks/useTheme';
 
-const HamburgerMenu: React.FC = () => {
+interface HamburgerMenuProps {
+  style?: React.CSSProperties;
+}
+
+const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ style }) => {
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div style={{ position: 'fixed', top: '2rem', left: '2rem', zIndex: 100 }}>
+    <div style={{ position: 'fixed', top: '2rem', left: '2rem', zIndex: 100, ...style }}>
       {/* Hamburger Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
