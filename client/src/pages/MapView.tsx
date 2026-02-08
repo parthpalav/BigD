@@ -101,11 +101,12 @@ const MapView: React.FC = () => {
             
             // Update dynamic insights with the new route
             if (prediction) {
-                const fuelEfficientRoute = selectedRouteType === 'best' 
-                    ? prediction.fuelEfficientRoute 
-                    : prediction.bestRoute;
-                
-                const dynamicInsights = generateDynamicInsights(newRoute, hour, fuelEfficientRoute);
+                const dynamicInsights = generateDynamicInsights(
+                    newRoute, 
+                    hour, 
+                    selectedRouteType === 'best' ? newRoute : prediction.bestRoute,
+                    selectedRouteType === 'fuel-efficient' ? newRoute : prediction.fuelEfficientRoute
+                );
                 
                 setDynamicPrediction({
                     ...prediction,
@@ -125,8 +126,12 @@ const MapView: React.FC = () => {
             setCurrentRoute(route);
             
             // Update dynamic insights for the selected route type
-            const compareRoute = type === 'best' ? prediction.fuelEfficientRoute : prediction.bestRoute;
-            const dynamicInsights = generateDynamicInsights(route, currentHour, compareRoute);
+            const dynamicInsights = generateDynamicInsights(
+                route, 
+                currentHour, 
+                prediction.bestRoute,
+                prediction.fuelEfficientRoute
+            );
             
             setDynamicPrediction({
                 ...prediction,

@@ -115,6 +115,31 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
                 </div>
             </div>
 
+            {/* Optimal Date Card - Prominent display */}
+            <div
+                style={{
+                    ...cardStyle,
+                    marginBottom: '0.75rem',
+                    background: theme === 'dark' 
+                        ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)'
+                        : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
+                    border: '2px solid rgba(16, 185, 129, 0.3)',
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: 700 }}>
+                        OPTIMAL DATE
+                    </span>
+                    <span style={{ fontSize: '1.5rem' }}>📅</span>
+                </div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#10b981', marginBottom: '0.25rem' }}>
+                    {prediction.optimalDate}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: theme === 'dark' ? '#a0a0a0' : '#666' }}>
+                    Best day for your journey
+                </div>
+            </div>
+
             {/* Travel Time Card */}
             <div
                 ref={(el) => { cardsRef.current[0] = el; }}
@@ -198,25 +223,15 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
             >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
                     <span style={{ fontSize: '0.875rem', color: theme === 'dark' ? '#a0a0a0' : '#666', fontWeight: 600 }}>
-                        OPTIMAL DEPARTURE
+                        OPTIMAL DEPARTURE TIME
                     </span>
                     <span style={{ fontSize: '1.5rem' }}>🕐</span>
                 </div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: theme === 'dark' ? 'white' : '#1a1a1a' }}>
                     {prediction.optimalDepartureTime}
                 </div>
-                <div 
-                    style={{ 
-                        fontSize: '0.875rem', 
-                        color: '#10b981', 
-                        marginTop: '0.5rem',
-                        fontWeight: 600,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.25rem'
-                    }}
-                >
-                    📅 {prediction.optimalDate}
+                <div style={{ fontSize: '0.875rem', color: theme === 'dark' ? '#a0a0a0' : '#666', marginTop: '0.5rem' }}>
+                    Best time to depart
                 </div>
             </div>
 

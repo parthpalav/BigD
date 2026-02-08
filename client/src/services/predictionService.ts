@@ -299,23 +299,22 @@ const findOptimalDate = (dateRange?: { start: Date; end: Date }): string => {
  * Generate dynamic insights based on current route and time
  */
 export const generateDynamicInsights = (
-    route: Route,
+    currentRoute: Route,
     hour: number,
-    fuelEfficientRoute?: Route
+    bestRoute: Route,
+    fuelEfficientRoute: Route
 ): TrafficPrediction['insights'] => {
     const congestionLevel =
-        route.avgCongestion < 30 ? 'low' :
-            route.avgCongestion < 60 ? 'moderate' :
-                route.avgCongestion < 80 ? 'high' : 'severe';
+        currentRoute.avgCongestion < 30 ? 'low' :
+            currentRoute.avgCongestion < 60 ? 'moderate' :
+                currentRoute.avgCongestion < 80 ? 'high' : 'severe';
 
-    // Calculate fuel savings if comparing with fuel-efficient route
-    let fuelSavings = 0;
-    if (fuelEfficientRoute) {
-        fuelSavings = Math.max(0, Math.round(fuelEfficientRoute.fuelEfficiency - route.fuelEfficiency));
-    }
+    // Always calculate fuel savings as: fuel-efficient route efficiency - fastest route efficiency
+    // This shows how much MORE efficient the fuel-efficient route is
+    const fuelSavings = Math.max(0, Math.round(fuelEfficientRoute.fuelEfficiency - bestRoute.fuelEfficiency));
 
     return {
-        estimatedTime: Math.round(route.totalDuration),
+        estimatedTime: Math.round(currentRoute.totalDuration),
         fuelSavings,
         congestionLevel,
         peakHours: ['07:00-09:00', '17:00-19:00'],
