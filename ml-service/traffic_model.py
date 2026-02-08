@@ -34,7 +34,7 @@ class TrafficPredictionModel:
         # Time-based features already included in synthetic data
         return features
     
-    def generate_synthetic_training_data(self, n_samples: int = 10000) -> np.ndarray:
+    def generate_synthetic_training_data(self, n_samples: int = 10000) -> Tuple[np.ndarray, np.ndarray]:
         """
         Generate synthetic training data based on traffic patterns
         This is used when historical TomTom data is not available

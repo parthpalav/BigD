@@ -53,6 +53,17 @@ export interface TimelineData {
     avgSpeed: number; // km/h
 }
 
+type MlPredictionPayload = {
+    data?: {
+        prediction?: {
+            congestion?: number;
+        };
+    };
+    prediction?: {
+        congestion?: number;
+    };
+};
+
 /**
  * Fetch route from Mapbox Directions API
  */
@@ -211,7 +222,7 @@ const getMLCongestionPrediction = async (
             free_flow_speed: 60,
         };
 
-        const parsePrediction = (data: any): number => {
+        const parsePrediction = (data: MlPredictionPayload): number => {
             const prediction = data?.data?.prediction ?? data?.prediction;
             if (prediction?.congestion === undefined || prediction?.congestion === null) {
                 throw new Error('ML prediction missing congestion value');
@@ -504,11 +515,12 @@ export const generateDynamicInsights = (
 /**
  * Generate timeline data for 24 hours
  */
-export const generateTimelineData = (_route: Route): TimelineData[] => {
+export const generateTimelineData = (route: Route): TimelineData[] => {
     const timeline: TimelineData[] = [];
+    const baselineShift = Math.max(-15, Math.min(15, route.avgCongestion - 50));
 
     for (let hour = 0; hour < 24; hour++) {
-        const congestion = getCongestionForTime(hour);
+        const congestion = Math.max(0, Math.min(100, getCongestionForTime(hour) + baselineShift));
         const avgSpeed = 60 * (1 - (congestion / 100) * 0.6);
 
         timeline.push({

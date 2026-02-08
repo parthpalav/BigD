@@ -8,8 +8,9 @@ import mlRoutes from './routes/ml';
 import chatRoutes from './routes/chat';
 import newsRoutes from './routes/news';
 
-// Load environment variables (ensure server/.env is used regardless of CWD)
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Load environment variables (root first, then server/.env overrides)
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env'), override: true });
 
 // Initialize Express app
 const app: Application = express();
