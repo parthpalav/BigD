@@ -1,8 +1,17 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const router = Router();
+
+// Featherless API response type
+interface FeatherlessChatResponse {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
+}
 
 // Featherless API configuration
 const FEATHERLESS_API_URL = 'https://api.featherless.ai/v1/chat/completions';
@@ -50,7 +59,7 @@ router.post('/', chatValidation, async (req: Request, res: Response) => {
     // Call Featherless AI API
     console.log('🤖 Sending message to AI:', message.substring(0, 50) + '...');
     
-    const aiResponse = await axios.post(
+    const aiResponse = await axios.post<FeatherlessChatResponse>(
       FEATHERLESS_API_URL,
       {
         model: FEATHERLESS_MODEL,
@@ -75,7 +84,7 @@ router.post('/', chatValidation, async (req: Request, res: Response) => {
     );
 
     // Extract AI response
-    const reply = aiResponse.data?.choices?.[0]?.message?.content;
+    const reply = aiResponse.data.choices[0]?.message?.content;
     
     if (!reply) {
       console.error('❌ No response content from AI');
@@ -93,11 +102,11 @@ router.post('/', chatValidation, async (req: Request, res: Response) => {
       reply: reply
     });
 
-  } catch (error: any) {
-    console.error('❌ Chat API error:', error.message);
+  } catch (error: unknown) {
+    console.error('❌ Chat API error:', error instanceof Error ? error.message : 'Unknown error');
 
     // Handle Axios errors
-    if (axios.isAxiosError(error)) {
+    if (error instanceof AxiosError) {
       if (error.response) {
         // API returned an error response
         console.error('API Error Response:', error.response.data);
@@ -122,7 +131,7 @@ router.post('/', chatValidation, async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'An unexpected error occurred. Please try again.',
-      error: process.env.NODE_ENV === 'development' 
+      error: process.env.NODE_ENV === 'development' && error instanceof Error
         ? error.message 
         : undefined
     });

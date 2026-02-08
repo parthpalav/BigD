@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
 import LogoutButton from '../components/LogoutButton';
@@ -86,18 +87,32 @@ const Assistant: React.FC = () => {
 
     const userMessage: Message = { role: 'user', content: inputValue };
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue('');
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual API call later)
-    setTimeout(() => {
+    try {
+      // Call backend API
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+      const response = await axios.post(`${API_URL}/chat`, {
+        message: currentInput
+      });
+
       const assistantMessage: Message = {
         role: 'assistant',
-        content: 'I\'m Atlas, your operational intelligence assistant. I\'m here to help you with traffic insights and routing optimization. (This is a demo response - AI integration coming soon!)',
+        content: response.data.reply || 'I received your message but couldn\'t generate a response.',
       };
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error: any) {
+      console.error('Failed to get AI response:', error);
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error processing your request. Please try again later.',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
