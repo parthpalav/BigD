@@ -1,5 +1,7 @@
 // ML Prediction Service for ORION Traffic Intelligence Platform
-// Simulates ML predictions - can be connected to backend API later
+// Uses Mapbox Directions API for real road routes
+
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 export interface Location {
     name: string;
@@ -44,45 +46,68 @@ export interface TimelineData {
 }
 
 /**
- * Generate a realistic route between two points
+ * Fetch route from Mapbox Directions API
  */
-const generateRoute = (
+const fetchMapboxRoute = async (
+    source: Location,
+    destination: Location,
+    routeType: 'best' | 'fuel-efficient'
+): Promise<[number, number][]> => {
+    const [srcLng, srcLat] = source.coordinates;
+    const [destLng, destLat] = destination.coordinates;
+
+    // Use different profiles for different route types
+    const profile = routeType === 'fuel-efficient' ? 'driving' : 'driving-traffic';
+    
+    const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${srcLng},${srcLat};${destLng},${destLat}?geometries=geojson&overview=full&steps=true&access_token=${MAPBOX_TOKEN}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.routes && data.routes.length > 0) {
+            // Return the route geometry coordinates
+            return data.routes[0].geometry.coordinates;
+        }
+    } catch (error) {
+        console.error('Error fetching Mapbox route:', error);
+    }
+
+    // Fallback to straight line if API fails
+    return [[srcLng, srcLat], [destLng, destLat]];
+};
+
+/**
+ * Generate a realistic route between two points using Mapbox Directions API
+ */
+const generateRoute = async (
     source: Location,
     destination: Location,
     routeType: 'best' | 'fuel-efficient',
     timeOfDay: number
-): Route => {
-    const [srcLng, srcLat] = source.coordinates;
-    const [destLng, destLat] = destination.coordinates;
+): Promise<Route> => {
+    // Fetch actual road-based route from Mapbox
+    const routeCoordinates = await fetchMapboxRoute(source, destination, routeType);
 
-    // Calculate base distance
-    const distance = calculateHaversineDistance(source.coordinates, destination.coordinates);
+    // Calculate actual distance
+    let totalDistance = 0;
+    for (let i = 0; i < routeCoordinates.length - 1; i++) {
+        totalDistance += calculateHaversineDistance(routeCoordinates[i], routeCoordinates[i + 1]);
+    }
 
-    // Generate waypoints for the route
-    const numSegments = Math.max(3, Math.floor(distance / 5)); // Segment every ~5km
+    // Split route into segments for traffic visualization
+    const segmentSize = Math.max(10, Math.floor(routeCoordinates.length / 5)); // 5 segments
     const segments: RouteSegment[] = [];
 
-    // Create a smooth curve with minimal deviation
-    const routeOffset = routeType === 'fuel-efficient' ? 0.0008 : 0.0003; // Very small offset
-    
-    for (let i = 0; i < numSegments; i++) {
-        const progress = i / numSegments;
-        const nextProgress = (i + 1) / numSegments;
+    for (let i = 0; i < routeCoordinates.length; i += segmentSize) {
+        const segmentCoords = routeCoordinates.slice(i, Math.min(i + segmentSize, routeCoordinates.length));
+        
+        if (segmentCoords.length < 2) continue;
 
-        // Create smooth segment with minimal curve
-        const segmentCoords: [number, number][] = [];
-        const steps = 10; // More steps for smoother lines
-
-        for (let j = 0; j <= steps; j++) {
-            const stepProgress = progress + (nextProgress - progress) * (j / steps);
-            
-            // Add a smooth curve using sine function (much smaller amplitude)
-            const curve = Math.sin(stepProgress * Math.PI) * routeOffset;
-            
-            const lng = srcLng + (destLng - srcLng) * stepProgress;
-            const lat = srcLat + (destLat - srcLat) * stepProgress + curve;
-            
-            segmentCoords.push([lng, lat]);
+        // Calculate segment distance
+        let segmentDistance = 0;
+        for (let j = 0; j < segmentCoords.length - 1; j++) {
+            segmentDistance += calculateHaversineDistance(segmentCoords[j], segmentCoords[j + 1]);
         }
 
         // Calculate congestion based on time of day and route type
@@ -91,7 +116,6 @@ const generateRoute = (
             ? Math.max(0, baseCongestion - 15 + Math.random() * 10)
             : baseCongestion + Math.random() * 10;
 
-        const segmentDistance = distance / numSegments;
         const segmentDuration = calculateDuration(segmentDistance, congestion);
 
         segments.push({
@@ -102,7 +126,6 @@ const generateRoute = (
         });
     }
 
-    const totalDistance = segments.reduce((sum, seg) => sum + seg.distance, 0);
     const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0);
     const avgCongestion = segments.reduce((sum, seg) => sum + seg.congestionLevel, 0) / segments.length;
 
@@ -179,14 +202,13 @@ export const predictTraffic = async (
     departureTime: Date,
     dateRange?: { start: Date; end: Date }
 ): Promise<TrafficPrediction> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
     const hour = departureTime.getHours();
 
-    // Generate both routes
-    const bestRoute = generateRoute(source, destination, 'best', hour);
-    const fuelEfficientRoute = generateRoute(source, destination, 'fuel-efficient', hour);
+    // Generate both routes (now async with Mapbox API)
+    const [bestRoute, fuelEfficientRoute] = await Promise.all([
+        generateRoute(source, destination, 'best', hour),
+        generateRoute(source, destination, 'fuel-efficient', hour)
+    ]);
 
     // Find optimal departure time (avoid rush hours)
     const optimalHour = findOptimalDepartureTime(hour);
