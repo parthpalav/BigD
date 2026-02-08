@@ -616,7 +616,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
           callback: async (response: any) => {
             try {
               await loginWithGoogle(response.credential);
-              navigate('/map');
+              navigate('/mapview');
             } catch (err) {
               console.error('Google login failed:', err);
               setError('Google login failed');
@@ -659,7 +659,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
 
     try {
       await login(username, password);
-      navigate('/map');
+      navigate('/mapview');
     } catch (err) {
       const error = err as Error;
       setError(error.message || 'Login failed');

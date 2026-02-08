@@ -1,6 +1,7 @@
 // MapView Page - Main AI-Powered Traffic Intelligence Platform
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LogoutButton from '../components/LogoutButton';
 import MapContainer from '../components/map/MapContainer';
@@ -26,6 +27,7 @@ type Theme = 'light' | 'dark';
 const MapView: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('dark');
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [sourceLocation, setSourceLocation] = useState<[number, number] | undefined>();
     const [destinationLocation, setDestinationLocation] = useState<[number, number] | undefined>();
@@ -258,8 +260,27 @@ const MapView: React.FC = () => {
                         </motion.div>
                     )}
 
-                    {/* Logout */}
-                    <LogoutButton />
+                    {/* Home Button */}
+                    <motion.button
+                        onClick={() => navigate('/')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            borderRadius: '2rem',
+                            background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                            border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
+                            cursor: 'pointer',
+                            color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            transition: 'all 0.3s ease',
+                        }}
+                    >
+                        Home
+                    </motion.button>
                 </div>
 
                 {/* Right Side - Controls */}
@@ -322,6 +343,9 @@ const MapView: React.FC = () => {
                     >
                         {theme === 'dark' ? 'Light' : 'Dark'}
                     </motion.button>
+
+                    {/* Logout Button */}
+                    <LogoutButton />
                 </div>
             </div>
 

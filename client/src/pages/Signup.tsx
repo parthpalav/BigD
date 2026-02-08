@@ -127,7 +127,7 @@ const SignupPage = () => {
     try {
       await register(formData.email, formData.password, formData.name, formData.phone || undefined);
       // Registration successful, navigate to map page
-      navigate('/map');
+      navigate('/mapview');
     } catch (err) {
       const error = err as Error;
       setError(error.message || 'Registration failed. Please try again.');
