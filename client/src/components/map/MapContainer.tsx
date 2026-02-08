@@ -30,6 +30,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
     const [mapLoaded, setMapLoaded] = useState(false);
     const sourceMarker = useRef<mapboxgl.Marker | null>(null);
     const destMarker = useRef<mapboxgl.Marker | null>(null);
+    const userLocationMarker = useRef<mapboxgl.Marker | null>(null);
+    const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
     // Initialize map
     useEffect(() => {
@@ -51,11 +53,33 @@ const MapContainer: React.FC<MapContainerProps> = ({
         // Add scale control
         map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
 
+        // Add geolocation control
+        const geolocateControl = new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true,
+            showUserHeading: true,
+            showAccuracyCircle: true
+        });
+        
+        map.current.addControl(geolocateControl, 'top-right');
+
+        // Get user's location on map load and center map
         map.current.on('load', () => {
             setMapLoaded(true);
             if (onMapLoad && map.current) {
                 onMapLoad(map.current);
             }
+            
+            // Trigger geolocation
+            geolocateControl.trigger();
+        });
+
+        // Listen for geolocation updates
+        geolocateControl.on('geolocate', (e: any) => {
+            const userCoords: [number, number] = [e.coords.longitude, e.coords.latitude];
+            setUserLocation(userCoords);
         });
 
         return () => {
