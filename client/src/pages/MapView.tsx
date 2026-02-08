@@ -79,7 +79,7 @@ const MapView: React.FC = () => {
         }
     };
 
-    const handleHourChange = (hour: number) => {
+    const handleHourChange = async (hour: number) => {
         setCurrentHour(hour);
 
         // Update route based on new hour if we have prediction data
@@ -93,7 +93,7 @@ const MapView: React.FC = () => {
                 coordinates: destinationLocation,
             };
 
-            const newRoute = getRouteAtTime(source, destination, hour, selectedRouteType);
+            const newRoute = await getRouteAtTime(source, destination, hour, selectedRouteType);
             setCurrentRoute(newRoute);
         }
     };

@@ -56,17 +56,26 @@ const fetchMapboxRoute = async (
     const [srcLng, srcLat] = source.coordinates;
     const [destLng, destLat] = destination.coordinates;
 
-    // Use different profiles for different route types
-    const profile = routeType === 'fuel-efficient' ? 'driving' : 'driving-traffic';
-    
-    const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${srcLng},${srcLat};${destLng},${destLat}?geometries=geojson&overview=full&steps=true&access_token=${MAPBOX_TOKEN}`;
+    // Use different parameters for different route types
+    let url: string;
+    if (routeType === 'fuel-efficient') {
+        // Request alternative routes and use the second one if available
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving/${srcLng},${srcLat};${destLng},${destLat}?alternatives=true&geometries=geojson&overview=full&steps=true&access_token=${MAPBOX_TOKEN}`;
+    } else {
+        // Use traffic profile for best/fastest route
+        url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${srcLng},${srcLat};${destLng},${destLat}?geometries=geojson&overview=full&steps=true&access_token=${MAPBOX_TOKEN}`;
+    }
 
     try {
         const response = await fetch(url);
         const data = await response.json();
 
         if (data.routes && data.routes.length > 0) {
-            // Return the route geometry coordinates
+            // For fuel-efficient, try to use an alternative route if available
+            if (routeType === 'fuel-efficient' && data.routes.length > 1) {
+                return data.routes[1].geometry.coordinates;
+            }
+            // Return the primary route
             return data.routes[0].geometry.coordinates;
         }
     } catch (error) {
@@ -297,11 +306,11 @@ export const generateTimelineData = (_route: Route): TimelineData[] => {
 /**
  * Get route at specific time
  */
-export const getRouteAtTime = (
+export const getRouteAtTime = async (
     source: Location,
     destination: Location,
     hour: number,
     routeType: 'best' | 'fuel-efficient' = 'best'
-): Route => {
-    return generateRoute(source, destination, routeType, hour);
+): Promise<Route> => {
+    return await generateRoute(source, destination, routeType, hour);
 };
