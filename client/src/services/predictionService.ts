@@ -30,6 +30,7 @@ export interface TrafficPrediction {
     fuelEfficientRoute: Route;
     optimalDepartureTime: string;
     optimalDate: string;
+    usedDateRange: boolean; // Whether date range optimization was used
     confidence: number; // 0-100
     insights: {
         estimatedTime: number; // minutes
@@ -252,6 +253,7 @@ export const predictTraffic = async (
         fuelEfficientRoute,
         optimalDepartureTime,
         optimalDate,
+        usedDateRange: !!dateRange, // True if date range was provided
         confidence: 85 + Math.random() * 10, // 85-95% confidence
         insights: {
             estimatedTime: Math.round(bestRoute.totalDuration),
