@@ -128,7 +128,7 @@ const Assistant: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: '300vh',
+        minHeight: currentSection === 3 ? '100vh' : '300vh',
         background: theme === 'dark' ? '#000' : '#fff',
         color: theme === 'dark' ? '#fff' : '#000',
         transition: 'background 0.5s ease, color 0.5s ease',
@@ -346,9 +346,11 @@ const Assistant: React.FC = () => {
         ref={section3Ref}
         style={{
           minHeight: '100vh',
+          maxHeight: '100vh',
           padding: '2rem',
           display: 'flex',
           flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
         {/* Atlas Branding */}
@@ -519,7 +521,10 @@ const Assistant: React.FC = () => {
           )}
 
           {/* Input Area */}
-          <div style={{ position: messages.length > 0 ? 'sticky' : 'relative', bottom: '2rem' }}>
+          <div style={{ 
+            flexShrink: 0,
+            paddingBottom: '2rem',
+          }}>
             <div
               style={{
                 background: theme === 'dark' ? '#141414' : '#f9fafb',
