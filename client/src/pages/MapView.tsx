@@ -171,39 +171,40 @@ const MapView: React.FC = () => {
                     zIndex: 100,
                 }}
             >
-                {/* Logo */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                    }}
-                >
-                    <div style={{
-                        fontSize: '1.75rem',
-                        fontWeight: 800,
-                        background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        letterSpacing: '0.05em',
-                    }}>
-                        ORION
-                    </div>
-                    <div style={{
-                        fontSize: '0.75rem',
-                        color: theme === 'dark' ? '#888' : '#666',
-                        borderLeft: `2px solid ${theme === 'dark' ? '#333' : '#ddd'}`,
-                        paddingLeft: '0.75rem',
-                        fontWeight: 500,
-                    }}>
-                        AI Traffic Intelligence
-                    </div>
-                </motion.div>
-
-                {/* Right Controls */}
+                {/* Left Side - User Info & Logout */}
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    {/* Logo */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            marginRight: '1rem',
+                        }}
+                    >
+                        <div style={{
+                            fontSize: '1.75rem',
+                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            letterSpacing: '0.05em',
+                        }}>
+                            ORION
+                        </div>
+                        <div style={{
+                            fontSize: '0.75rem',
+                            color: theme === 'dark' ? '#888' : '#666',
+                            borderLeft: `2px solid ${theme === 'dark' ? '#333' : '#ddd'}`,
+                            paddingLeft: '0.75rem',
+                            fontWeight: 500,
+                        }}>
+                            AI Traffic Intelligence
+                        </div>
+                    </motion.div>
+
                     {/* User Info */}
                     {user && (
                         <motion.div
@@ -223,7 +224,12 @@ const MapView: React.FC = () => {
                         </motion.div>
                     )}
 
-                    {/* History Toggle */}
+                    {/* Logout */}
+                    <LogoutButton />
+                </div>
+
+                {/* Right Side - Controls */}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     {user?.id && (
                         <motion.button
                             onClick={() => setShowHistory(!showHistory)}
@@ -282,9 +288,6 @@ const MapView: React.FC = () => {
                     >
                         {theme === 'dark' ? 'Light' : 'Dark'}
                     </motion.button>
-
-                    {/* Logout */}
-                    <LogoutButton />
                 </div>
             </div>
 
@@ -370,21 +373,21 @@ const MapView: React.FC = () => {
                 </motion.div>
             )}
 
-            {/* Bottom Section - Timeline & Insights */}
+            {/* Right Sidebar - Insights & Timeline */}
             <div
                 style={{
                     position: 'fixed',
-                    bottom: 0,
-                    left: 0,
+                    top: '5rem',
                     right: 0,
+                    bottom: 0,
+                    width: '380px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '0.75rem',
-                    padding: '0 1.5rem 1rem',
+                    gap: '1rem',
+                    padding: '1rem',
+                    overflowY: 'auto',
                     pointerEvents: 'none',
                     zIndex: 80,
-                    maxHeight: '60vh',
-                    overflow: 'hidden',
                 }}
             >
                 {/* Insights Panel */}

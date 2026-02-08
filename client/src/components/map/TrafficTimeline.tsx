@@ -74,13 +74,11 @@ const TrafficTimeline: React.FC<TrafficTimelineProps> = ({
 
     return (
         <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
             style={{
                 width: '100%',
-                maxWidth: '700px',
-                margin: '0 auto',
                 background: theme === 'dark' ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(20px)',
                 border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',

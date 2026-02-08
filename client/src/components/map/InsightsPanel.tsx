@@ -58,15 +58,11 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
 
     return (
         <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             style={{
                 width: '100%',
-                maxWidth: '700px',
-                margin: '0 auto',
-                maxHeight: 'calc(40vh)',
-                overflowY: 'auto',
             }}
         >
             {/* Header */}
