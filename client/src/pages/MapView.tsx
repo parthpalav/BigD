@@ -1,7 +1,6 @@
 // MapView Page - Main AI-Powered Traffic Intelligence Platform
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LogoutButton from '../components/LogoutButton';
 import MapContainer from '../components/map/MapContainer';
@@ -26,7 +25,6 @@ type Theme = 'light' | 'dark';
 const MapView: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('dark');
     const { user, isAuthenticated } = useAuth();
-    const navigate = useNavigate();
 
     const [sourceLocation, setSourceLocation] = useState<[number, number] | undefined>();
     const [destinationLocation, setDestinationLocation] = useState<[number, number] | undefined>();
