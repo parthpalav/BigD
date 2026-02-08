@@ -53,7 +53,12 @@ const InputPanel: React.FC<InputPanelProps> = ({
     // Initialize geocoders once
     useEffect(() => {
         if (!sourceGeocoderRef.current || !destGeocoderRef.current) return;
-        if (sourceGeocoderInstance.current || destGeocoderInstance.current) return; // Prevent duplicate initialization
+        
+        // Clear any existing instances first
+        const sourceContainer = sourceGeocoderRef.current;
+        const destContainer = destGeocoderRef.current;
+        sourceContainer.innerHTML = '';
+        destContainer.innerHTML = '';
 
         const geocoderOptions: any = {
             accessToken: mapboxgl.accessToken,
@@ -67,42 +72,41 @@ const InputPanel: React.FC<InputPanelProps> = ({
             geocoderOptions.proximity = userProximity;
         }
 
-        sourceGeocoderInstance.current = new MapboxGeocoder({
+        const sourceGeocoder = new MapboxGeocoder({
             ...geocoderOptions,
-            placeholder: '📍 Enter source location...',
+            placeholder: 'Enter source location...',
         });
 
-        destGeocoderInstance.current = new MapboxGeocoder({
+        const destGeocoder = new MapboxGeocoder({
             ...geocoderOptions,
-            placeholder: '🎯 Enter destination...',
+            placeholder: 'Enter destination...',
         });
 
-        sourceGeocoderInstance.current.addTo(sourceGeocoderRef.current);
-        destGeocoderInstance.current.addTo(destGeocoderRef.current);
+        sourceGeocoder.addTo(sourceContainer);
+        destGeocoder.addTo(destContainer);
 
-        sourceGeocoderInstance.current.on('result', (e: any) => {
+        sourceGeocoder.on('result', (e: any) => {
             setSource({
                 name: e.result.place_name,
                 coordinates: e.result.center,
             });
         });
 
-        destGeocoderInstance.current.on('result', (e: any) => {
+        destGeocoder.on('result', (e: any) => {
             setDestination({
                 name: e.result.place_name,
                 coordinates: e.result.center,
             });
         });
 
+        sourceGeocoderInstance.current = sourceGeocoder;
+        destGeocoderInstance.current = destGeocoder;
+
         return () => {
-            if (sourceGeocoderInstance.current) {
-                sourceGeocoderInstance.current.clear();
-                sourceGeocoderInstance.current = null;
-            }
-            if (destGeocoderInstance.current) {
-                destGeocoderInstance.current.clear();
-                destGeocoderInstance.current = null;
-            }
+            sourceGeocoder.clear();
+            destGeocoder.clear();
+            sourceContainer.innerHTML = '';
+            destContainer.innerHTML = '';
         };
     }, [userProximity]);
 
@@ -246,7 +250,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                                 letterSpacing: '0.05em',
                             }}
                         >
-                            📍 Current
+                            Current
                         </motion.button>
                     </div>
                     <div ref={sourceGeocoderRef} />
@@ -274,7 +278,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
                                 letterSpacing: '0.05em',
                             }}
                         >
-                            📍 Current
+                            Current
                         </motion.button>
                     </div>
                     <div ref={destGeocoderRef} />
