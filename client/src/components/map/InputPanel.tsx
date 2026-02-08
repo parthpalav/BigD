@@ -209,19 +209,19 @@ const InputPanel: React.FC<InputPanelProps> = ({
         >
             <h2
                 style={{
-                    fontSize: '1.5rem',
+                    fontSize: '1rem',
                     fontWeight: 700,
                     color: theme === 'dark' ? 'white' : '#1a1a1a',
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.25rem',
                 }}
             >
                 Traffic Intelligence
             </h2>
             <p
                 style={{
-                    fontSize: '0.875rem',
+                    fontSize: '0.75rem',
                     color: theme === 'dark' ? '#a0a0a0' : '#666',
-                    marginBottom: '2rem',
+                    marginBottom: '1.5rem',
                 }}
             >
                 AI-powered route prediction and optimization

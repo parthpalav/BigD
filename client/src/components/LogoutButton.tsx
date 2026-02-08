@@ -26,24 +26,18 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, style }) 
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
       className={className}
       style={{
-        position: 'fixed',
-        top: '2rem',
-        right: '2rem',
-        zIndex: 100,
         display: 'flex',
         alignItems: 'center',
-        gap: '1rem',
         ...style,
       }}
     >
-      {/* User Info (optional) */}
-      {user && (
+      {/* User Info (optional) - Hidden, shown in parent */}
+      {false && user && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
