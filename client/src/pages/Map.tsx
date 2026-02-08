@@ -7,8 +7,8 @@ import { useTheme } from '../hooks/useTheme';
 import LogoutButton from '../components/LogoutButton';
 
 const Map: React.FC = () => {
-  const { theme, toggleTheme } = useTheme(); // Use theme from context
-  const { isAuthenticated, user } = useAuth();
+  const { theme } = useTheme(); // Use theme from context
+  const { user } = useAuth();
   // const navigate = useNavigate();
 
   return (

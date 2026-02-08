@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useTheme } from '../hooks/useTheme';
-import { useAuth } from '../hooks/useAuth';
 import LogoutButton from '../components/LogoutButton';
+import '../styles/assistant.css';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,7 +15,6 @@ interface Message {
 
 const Assistant: React.FC = () => {
   const { theme } = useTheme();
-  const { isAuthenticated } = useAuth();
   const [showNav, setShowNav] = useState(true);
   const [currentSection, setCurrentSection] = useState(1);
   const [inputValue, setInputValue] = useState('');
@@ -244,7 +245,7 @@ const Assistant: React.FC = () => {
             textAlign: 'center',
             background: theme === 'dark'
               ? 'linear-gradient(135deg, #fff 0%, #a0a0a0 100%)'
-              : theme === 'dark' ? '#fff' : '#000',
+              : '#000',
             WebkitBackgroundClip: theme === 'dark' ? 'text' : undefined,
             WebkitTextFillColor: theme === 'dark' ? 'transparent' : undefined,
             backgroundClip: theme === 'dark' ? 'text' : undefined,
@@ -390,6 +391,7 @@ const Assistant: React.FC = () => {
                   }}
                 >
                   <div
+                    className={message.role === 'assistant' ? 'atlas-message' : ''}
                     style={{
                       maxWidth: '70%',
                       padding: '1rem 1.25rem',
@@ -409,7 +411,52 @@ const Assistant: React.FC = () => {
                         ATLAS
                       </div>
                     )}
-                    {message.content}
+                    {message.role === 'assistant' ? (
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({node, ...props}) => <p style={{ marginBottom: '1rem', lineHeight: '1.7' }} {...props} />,
+                          h2: ({node, ...props}) => <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '1.5rem', marginBottom: '0.75rem' }} {...props} />,
+                          h3: ({node, ...props}) => <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginTop: '1.25rem', marginBottom: '0.5rem' }} {...props} />,
+                          ul: ({node, ...props}) => <ul style={{ marginLeft: '1.5rem', marginBottom: '1rem', listStyleType: 'disc' }} {...props} />,
+                          ol: ({node, ...props}) => <ol style={{ marginLeft: '1.5rem', marginBottom: '1rem' }} {...props} />,
+                          li: ({node, ...props}) => <li style={{ marginBottom: '0.5rem', lineHeight: '1.6' }} {...props} />,
+                          strong: ({node, ...props}) => <strong style={{ fontWeight: 600, color: '#3b82f6' }} {...props} />,
+                          code: ({node, inline, ...props}: any) => 
+                            inline ? (
+                              <code style={{ 
+                                background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', 
+                                padding: '0.125rem 0.375rem', 
+                                borderRadius: '0.25rem',
+                                fontSize: '0.9em',
+                                fontFamily: 'monospace'
+                              }} {...props} />
+                            ) : (
+                              <code style={{ 
+                                display: 'block',
+                                background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', 
+                                padding: '1rem', 
+                                borderRadius: '0.5rem',
+                                fontSize: '0.9em',
+                                fontFamily: 'monospace',
+                                overflowX: 'auto'
+                              }} {...props} />
+                            ),
+                          blockquote: ({node, ...props}) => <blockquote style={{ 
+                            borderLeft: '4px solid #3b82f6', 
+                            paddingLeft: '1rem', 
+                            marginLeft: '0',
+                            marginBottom: '1rem',
+                            fontStyle: 'italic',
+                            opacity: 0.9
+                          }} {...props} />
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    ) : (
+                      message.content
+                    )}
                   </div>
                 </motion.div>
               ))}

@@ -1,0 +1,96 @@
+/* Atlas Assistant Markdown Styling */
+
+.atlas-message {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.atlas-message p:last-child {
+  margin-bottom: 0;
+}
+
+.atlas-message h2:first-child,
+.atlas-message h3:first-child {
+  margin-top: 0.5rem;
+}
+
+.atlas-message ul:last-child,
+.atlas-message ol:last-child {
+  margin-bottom: 0;
+}
+
+.atlas-message li:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure proper spacing for nested lists */
+.atlas-message ul ul,
+.atlas-message ol ul,
+.atlas-message ul ol,
+.atlas-message ol ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Link styling */
+.atlas-message a {
+  color: #3b82f6;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.atlas-message a:hover {
+  color: #2563eb;
+}
+
+/* Table styling (if needed) */
+.atlas-message table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.atlas-message th,
+.atlas-message td {
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+
+.atlas-message th {
+  font-weight: 600;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .atlas-message table th,
+[data-theme="dark"] .atlas-message table td {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .atlas-message table th,
+[data-theme="light"] .atlas-message table td {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .atlas-message table th {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* Code block scrolling */
+.atlas-message pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Horizontal rule */
+.atlas-message hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1.5rem 0;
+}
+
+[data-theme="light"] .atlas-message hr {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
