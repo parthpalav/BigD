@@ -109,7 +109,7 @@ const handleSignup = async (req: Request, res: Response) => {
       data: {
         user: {
           id: user._id,
-          name: user.name,
+          fullName: user.name,
           email: user.email,
           createdAt: user.createdAt
         },
@@ -190,7 +190,7 @@ router.post('/login', loginValidation, async (req: Request, res: Response) => {
       data: {
         user: {
           id: user._id,
-          name: user.name,
+          fullName: user.name,
           email: user.email,
           createdAt: user.createdAt
         },
@@ -266,7 +266,7 @@ router.post('/google', async (req: Request, res: Response) => {
       data: {
         user: {
           id: user._id,
-          name: user.name,
+          fullName: user.name,
           email: user.email,
           createdAt: user.createdAt
         },
@@ -321,7 +321,7 @@ router.get('/me', async (req: Request, res: Response) => {
       data: {
         user: {
           id: user._id,
-          name: user.name,
+          fullName: user.name,
           email: user.email,
           createdAt: user.createdAt
         }
