@@ -219,7 +219,7 @@ const MapView: React.FC = () => {
                                 fontWeight: 500,
                             }}
                         >
-                            👋 {user.fullName || user.email}
+                            {user.fullName || user.email}
                         </motion.div>
                     )}
 
@@ -230,9 +230,8 @@ const MapView: React.FC = () => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '50%',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '2rem',
                                 background: showHistory
                                     ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                                     : theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
@@ -241,13 +240,16 @@ const MapView: React.FC = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                color: showHistory ? 'white' : theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
                                 boxShadow: showHistory ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none',
                                 transition: 'all 0.3s ease',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
                             }}
                         >
-                            <span style={{ fontSize: '1.25rem' }}>
-                                {showHistory ? '🕒' : '📋'}
-                            </span>
+                            History
                         </motion.button>
                     )}
 
@@ -257,9 +259,8 @@ const MapView: React.FC = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '50%',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '2rem',
                             background: theme === 'dark'
                                 ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
                                 : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
@@ -268,15 +269,18 @@ const MapView: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            color: 'white',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
                             boxShadow: theme === 'dark'
                                 ? '0 4px 12px rgba(59, 130, 246, 0.3)'
                                 : '0 4px 12px rgba(251, 191, 36, 0.3)',
                             transition: 'all 0.3s ease',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
                         }}
                     >
-                        <span style={{ fontSize: '1.25rem' }}>
-                            {theme === 'dark' ? '☀️' : '🌙'}
-                        </span>
+                        {theme === 'dark' ? 'Light' : 'Dark'}
                     </motion.button>
 
                     {/* Logout */}
@@ -341,7 +345,7 @@ const MapView: React.FC = () => {
                             fontSize: '0.875rem',
                         }}
                     >
-                        ⚡ Fastest Route
+                        Fastest Route
                     </motion.button>
                     <motion.button
                         onClick={() => handleRouteTypeChange('fuel-efficient')}
@@ -361,7 +365,7 @@ const MapView: React.FC = () => {
                             fontSize: '0.875rem',
                         }}
                     >
-                        🌿 Fuel Efficient
+                        Fuel Efficient
                     </motion.button>
                 </motion.div>
             )}

@@ -78,40 +78,36 @@ const TrafficTimeline: React.FC<TrafficTimelineProps> = ({
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
             style={{
-                position: 'absolute',
-                bottom: '2rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(100% - 4rem)',
-                maxWidth: '900px',
+                width: '100%',
+                maxWidth: '700px',
+                margin: '0 auto',
                 background: theme === 'dark' ? 'rgba(20, 20, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(20px)',
                 border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
-                borderRadius: '1.5rem',
-                padding: '1.5rem 2rem',
+                borderRadius: '1rem',
+                padding: '1rem 1.5rem',
                 boxShadow: theme === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.6)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
-                zIndex: 10,
             }}
         >
-            <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <h3
                         style={{
-                            fontSize: '1rem',
+                            fontSize: '0.875rem',
                             fontWeight: 700,
                             color: theme === 'dark' ? 'white' : '#1a1a1a',
-                            marginBottom: '0.25rem',
+                            marginBottom: '0.125rem',
                         }}
                     >
                         Traffic Timeline
                     </h3>
-                    <p style={{ fontSize: '0.75rem', color: theme === 'dark' ? '#a0a0a0' : '#666', margin: 0 }}>
-                        Drag to explore traffic patterns throughout the day
+                    <p style={{ fontSize: '0.7rem', color: theme === 'dark' ? '#a0a0a0' : '#666', margin: 0 }}>
+                        Drag to explore patterns
                     </p>
                 </div>
                 <div
                     style={{
-                        fontSize: '1.5rem',
+                        fontSize: '1.25rem',
                         fontWeight: 700,
                         color: '#3b82f6',
                     }}
@@ -127,11 +123,11 @@ const TrafficTimeline: React.FC<TrafficTimelineProps> = ({
                 onMouseMove={handleMouseMove}
                 style={{
                     position: 'relative',
-                    height: '60px',
-                    borderRadius: '0.75rem',
+                    height: '50px',
+                    borderRadius: '0.5rem',
                     overflow: 'hidden',
                     cursor: 'pointer',
-                    marginBottom: '1rem',
+                    marginBottom: '0.75rem',
                 }}
             >
                 {/* Traffic Bars */}
