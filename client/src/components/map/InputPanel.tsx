@@ -138,14 +138,32 @@ const InputPanel: React.FC<InputPanelProps> = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!source || !destination || !departureDate) {
+        if (!source || !destination) {
             alert('Please fill in all required fields');
             return;
         }
 
+        if (useDateRange && (!dateRangeStart || !dateRangeEnd)) {
+            alert('Please fill in the date range');
+            return;
+        }
+
+        if (!useDateRange && !departureDate) {
+            alert('Please fill in the departure date');
+            return;
+        }
+
         const [hours, minutes] = departureTime.split(':').map(Number);
-        const departureDateTime = new Date(departureDate);
-        departureDateTime.setHours(hours, minutes);
+        
+        let departureDateTime: Date;
+        if (useDateRange && dateRangeStart) {
+            // Use range start date with the specified time
+            departureDateTime = new Date(dateRangeStart);
+            departureDateTime.setHours(hours, minutes);
+        } else {
+            departureDateTime = new Date(departureDate);
+            departureDateTime.setHours(hours, minutes);
+        }
 
         const data: any = {
             source,
@@ -284,37 +302,6 @@ const InputPanel: React.FC<InputPanelProps> = ({
                     <div ref={destGeocoderRef} data-theme={theme} style={{ position: 'relative' }} />
                 </div>
 
-                {/* Departure Date */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <label htmlFor="departureDate" style={labelStyle}>
-                        Departure Date
-                    </label>
-                    <input
-                        id="departureDate"
-                        type="date"
-                        value={departureDate}
-                        onChange={(e) => setDepartureDate(e.target.value)}
-                        required
-                        style={inputStyle}
-                        min={new Date().toISOString().split('T')[0]}
-                    />
-                </div>
-
-                {/* Departure Time */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <label htmlFor="departureTime" style={labelStyle}>
-                        Departure Time
-                    </label>
-                    <input
-                        id="departureTime"
-                        type="time"
-                        value={departureTime}
-                        onChange={(e) => setDepartureTime(e.target.value)}
-                        required
-                        style={inputStyle}
-                    />
-                </div>
-
                 {/* Date Range Toggle */}
                 <div style={{ marginBottom: '1.5rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -322,9 +309,9 @@ const InputPanel: React.FC<InputPanelProps> = ({
                             type="checkbox"
                             checked={useDateRange}
                             onChange={(e) => setUseDateRange(e.target.checked)}
-                            style={{ marginRight: '0.5rem' }}
+                            style={{ marginRight: '0.5rem', cursor: 'pointer' }}
                         />
-                        <span style={{ fontSize: '0.875rem', color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a' }}>
+                        <span style={{ fontSize: '0.875rem', color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a', fontWeight: 500 }}>
                             Find optimal date in range
                         </span>
                     </label>
@@ -340,32 +327,67 @@ const InputPanel: React.FC<InputPanelProps> = ({
                     >
                         <div style={{ marginBottom: '1rem' }}>
                             <label htmlFor="dateRangeStart" style={labelStyle}>
-                                Range Start
+                                Range Start Date
                             </label>
                             <input
                                 id="dateRangeStart"
                                 type="date"
                                 value={dateRangeStart}
                                 onChange={(e) => setDateRangeStart(e.target.value)}
+                                required={useDateRange}
                                 style={inputStyle}
                                 min={new Date().toISOString().split('T')[0]}
                             />
                         </div>
                         <div>
                             <label htmlFor="dateRangeEnd" style={labelStyle}>
-                                Range End
+                                Range End Date
                             </label>
                             <input
                                 id="dateRangeEnd"
                                 type="date"
                                 value={dateRangeEnd}
                                 onChange={(e) => setDateRangeEnd(e.target.value)}
+                                required={useDateRange}
                                 style={inputStyle}
                                 min={dateRangeStart || new Date().toISOString().split('T')[0]}
                             />
                         </div>
                     </motion.div>
                 )}
+
+                {/* Departure Date */}
+                {!useDateRange && (
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label htmlFor="departureDate" style={labelStyle}>
+                            Departure Date
+                        </label>
+                        <input
+                            id="departureDate"
+                            type="date"
+                            value={departureDate}
+                            onChange={(e) => setDepartureDate(e.target.value)}
+                            required
+                            style={inputStyle}
+                            min={new Date().toISOString().split('T')[0]}
+                        />
+                    </div>
+                )}
+
+                {/* Departure Time */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label htmlFor="departureTime" style={labelStyle}>
+                        {useDateRange ? 'Preferred Time' : 'Departure Time'}
+                    </label>
+                    <input
+                        id="departureTime"
+                        type="time"
+                        value={departureTime}
+                        onChange={(e) => setDepartureTime(e.target.value)}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
 
                 {/* Submit Button */}
                 <motion.button

@@ -205,8 +205,18 @@ const InsightsPanel: React.FC<InsightsPanelProps> = ({
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: theme === 'dark' ? 'white' : '#1a1a1a' }}>
                     {prediction.optimalDepartureTime}
                 </div>
-                <div style={{ fontSize: '0.875rem', color: theme === 'dark' ? '#a0a0a0' : '#666', marginTop: '0.5rem' }}>
-                    {prediction.optimalDate}
+                <div 
+                    style={{ 
+                        fontSize: '0.875rem', 
+                        color: '#10b981', 
+                        marginTop: '0.5rem',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                    }}
+                >
+                    📅 {prediction.optimalDate}
                 </div>
             </div>
 
