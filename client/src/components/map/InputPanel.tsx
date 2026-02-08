@@ -32,21 +32,47 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
     const sourceGeocoderRef = useRef<HTMLDivElement>(null);
     const destGeocoderRef = useRef<HTMLDivElement>(null);
+    const [userProximity, setUserProximity] = useState<[number, number] | null>(null);
+
+    // Get user's location for proximity-based suggestions
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setUserProximity([position.coords.longitude, position.coords.latitude]);
+                },
+                (error) => {
+                    console.log('Geolocation not available:', error);
+                }
+            );
+        }
+    }, []);
 
     // Initialize geocoders
     useEffect(() => {
         if (!sourceGeocoderRef.current || !destGeocoderRef.current) return;
 
-        const sourceGeocoder = new MapboxGeocoder({
+        const geocoderOptions: any = {
             accessToken: mapboxgl.accessToken,
-            placeholder: 'Enter source location...',
             mapboxgl: mapboxgl as any,
+            countries: 'us,in,gb,ca,au', // Focus on major countries
+            types: 'place,address,poi,locality,neighborhood', // Include points of interest
+            limit: 8, // Show more suggestions
+        };
+
+        // Add proximity if user location is available
+        if (userProximity) {
+            geocoderOptions.proximity = userProximity;
+        }
+
+        const sourceGeocoder = new MapboxGeocoder({
+            ...geocoderOptions,
+            placeholder: '📍 Enter source location...',
         });
 
         const destGeocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            placeholder: 'Enter destination...',
-            mapboxgl: mapboxgl as any,
+            ...geocoderOptions,
+            placeholder: '🎯 Enter destination...',
         });
 
         sourceGeocoder.addTo(sourceGeocoderRef.current);
@@ -70,7 +96,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
             sourceGeocoder.clear();
             destGeocoder.clear();
         };
-    }, []);
+    }, [userProximity]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
