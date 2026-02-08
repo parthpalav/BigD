@@ -144,7 +144,7 @@ const MapView: React.FC = () => {
                 transition: 'background 0.5s ease',
             }}
         >
-            {/* Map Container */}
+            {/* Map Container - Base Layer */}
             <MapContainer
                 sourceLocation={sourceLocation}
                 destinationLocation={destinationLocation}
@@ -153,14 +153,145 @@ const MapView: React.FC = () => {
                 theme={theme}
             />
 
-            {/* Input Panel */}
+            {/* Top Bar - Controls & User Info */}
+            <div
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '1rem 1.5rem',
+                    background: theme === 'dark' 
+                        ? 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)'
+                        : 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    zIndex: 100,
+                }}
+            >
+                {/* Logo */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                    }}
+                >
+                    <div style={{
+                        fontSize: '1.75rem',
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        letterSpacing: '0.05em',
+                    }}>
+                        ORION
+                    </div>
+                    <div style={{
+                        fontSize: '0.75rem',
+                        color: theme === 'dark' ? '#888' : '#666',
+                        borderLeft: `2px solid ${theme === 'dark' ? '#333' : '#ddd'}`,
+                        paddingLeft: '0.75rem',
+                        fontWeight: 500,
+                    }}>
+                        AI Traffic Intelligence
+                    </div>
+                </motion.div>
+
+                {/* Right Controls */}
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    {/* User Info */}
+                    {user && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '2rem',
+                                background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                                color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
+                                fontSize: '0.875rem',
+                                fontWeight: 500,
+                            }}
+                        >
+                            👋 {user.fullName || user.email}
+                        </motion.div>
+                    )}
+
+                    {/* History Toggle */}
+                    {user?.id && (
+                        <motion.button
+                            onClick={() => setShowHistory(!showHistory)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                width: '44px',
+                                height: '44px',
+                                borderRadius: '50%',
+                                background: showHistory
+                                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                                    : theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: showHistory ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none',
+                                transition: 'all 0.3s ease',
+                            }}
+                        >
+                            <span style={{ fontSize: '1.25rem' }}>
+                                {showHistory ? '🕒' : '📋'}
+                            </span>
+                        </motion.button>
+                    )}
+
+                    {/* Theme Toggle */}
+                    <motion.button
+                        onClick={toggleTheme}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '50%',
+                            background: theme === 'dark'
+                                ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
+                                : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: theme === 'dark'
+                                ? '0 4px 12px rgba(59, 130, 246, 0.3)'
+                                : '0 4px 12px rgba(251, 191, 36, 0.3)',
+                            transition: 'all 0.3s ease',
+                        }}
+                    >
+                        <span style={{ fontSize: '1.25rem' }}>
+                            {theme === 'dark' ? '☀️' : '🌙'}
+                        </span>
+                    </motion.button>
+
+                    {/* Logout */}
+                    <LogoutButton />
+                </div>
+            </div>
+
+            {/* Left Sidebar - Input Panel */}
             <InputPanel
                 onSubmit={handlePredictionSubmit}
                 isLoading={isLoading}
                 theme={theme}
             />
 
-            {/* Search History */}
+            {/* Right Sidebar - Search History */}
             {user?.id && (
                 <SearchHistory
                     userId={user.id}
@@ -170,33 +301,15 @@ const MapView: React.FC = () => {
                 />
             )}
 
-            {/* Insights Panel */}
-            {prediction && (
-                <InsightsPanel
-                    prediction={prediction}
-                    theme={theme}
-                />
-            )}
-
-            {/* Traffic Timeline */}
-            {currentRoute && (
-                <TrafficTimeline
-                    route={currentRoute}
-                    currentHour={currentHour}
-                    onHourChange={handleHourChange}
-                    theme={theme}
-                />
-            )}
-
-            {/* Route Type Selector */}
+            {/* Route Type Selector - Top Center */}
             {prediction && (
                 <motion.div
                     initial={{ y: -100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
                     style={{
-                        position: 'absolute',
-                        top: '2rem',
+                        position: 'fixed',
+                        top: '5.5rem',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         display: 'flex',
@@ -206,14 +319,14 @@ const MapView: React.FC = () => {
                         border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '1rem',
                         padding: '0.5rem',
-                        boxShadow: theme === 'dark' ? '0 4px 16px rgba(0, 0, 0, 0.6)' : '0 4px 16px rgba(0, 0, 0, 0.1)',
-                        zIndex: 10,
+                        boxShadow: theme === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.6)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        zIndex: 90,
                     }}
                 >
                     <motion.button
                         onClick={() => handleRouteTypeChange('best')}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         style={{
                             padding: '0.75rem 1.5rem',
                             borderRadius: '0.75rem',
@@ -225,14 +338,15 @@ const MapView: React.FC = () => {
                             fontWeight: 600,
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
+                            fontSize: '0.875rem',
                         }}
                     >
                         ⚡ Fastest Route
                     </motion.button>
                     <motion.button
                         onClick={() => handleRouteTypeChange('fuel-efficient')}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         style={{
                             padding: '0.75rem 1.5rem',
                             borderRadius: '0.75rem',
@@ -244,6 +358,7 @@ const MapView: React.FC = () => {
                             fontWeight: 600,
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
+                            fontSize: '0.875rem',
                         }}
                     >
                         🌿 Fuel Efficient
@@ -251,93 +366,43 @@ const MapView: React.FC = () => {
                 </motion.div>
             )}
 
-            {/* Logout Button */}
-            <LogoutButton />
-
-            {/* History Toggle */}
-            <motion.button
-                onClick={() => setShowHistory(!showHistory)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+            {/* Bottom Section - Timeline & Insights */}
+            <div
                 style={{
                     position: 'fixed',
-                    top: '2rem',
-                    right: isAuthenticated ? '26rem' : '7rem',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    background: showHistory
-                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                        : 'rgba(100, 100, 100, 0.5)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    zIndex: 100,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: showHistory
-                        ? '0 0 20px rgba(16, 185, 129, 0.4)'
-                        : 'none',
-                    transition: 'all 0.3s ease',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    padding: '0 1.5rem 1.5rem',
+                    pointerEvents: 'none',
+                    zIndex: 80,
                 }}
             >
-                <span style={{ fontSize: '1.5rem' }}>
-                    {showHistory ? '🕒' : '📋'}
-                </span>
-            </motion.button>
+                {/* Insights Panel */}
+                {prediction && (
+                    <div style={{ pointerEvents: 'auto' }}>
+                        <InsightsPanel
+                            prediction={prediction}
+                            theme={theme}
+                        />
+                    </div>
+                )}
 
-            {/* Theme Toggle */}
-            <motion.button
-                onClick={toggleTheme}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                style={{
-                    position: 'fixed',
-                    top: '2rem',
-                    right: isAuthenticated ? '22rem' : '2rem',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    background: theme === 'dark'
-                        ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
-                        : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    zIndex: 100,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: theme === 'dark'
-                        ? '0 0 20px rgba(59, 130, 246, 0.4)'
-                        : '0 0 20px rgba(251, 191, 36, 0.4)',
-                    transition: 'all 0.3s ease',
-                }}
-            >
-                <span style={{ fontSize: '1.5rem' }}>
-                    {theme === 'dark' ? '☀️' : '🌙'}
-                </span>
-            </motion.button>
-
-            {/* Branding */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                style={{
-                    position: 'fixed',
-                    bottom: '2rem',
-                    right: '2rem',
-                    fontSize: '0.875rem',
-                    color: theme === 'dark' ? '#666' : '#999',
-                    zIndex: 100,
-                    textAlign: 'right',
-                }}
-            >
-                <div style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '0.25rem' }}>
-                    ORION
-                </div>
-                <div>AI-Powered Traffic Intelligence</div>
-            </motion.div>
+                {/* Traffic Timeline */}
+                {currentRoute && (
+                    <div style={{ pointerEvents: 'auto' }}>
+                        <TrafficTimeline
+                            route={currentRoute}
+                            currentHour={currentHour}
+                            onHourChange={handleHourChange}
+                            theme={theme}
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
