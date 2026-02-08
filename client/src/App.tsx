@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
@@ -28,7 +28,7 @@ declare global {
 }
 
 // Hamburger Menu Component
-const HamburgerMenu = ({ theme }: { theme: Theme }) => {
+const HamburgerMenu = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -168,6 +168,73 @@ const HamburgerMenu = ({ theme }: { theme: Theme }) => {
               <span style={{ fontSize: '1.25rem' }}>📜</span>
               <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>History</span>
             </motion.div>
+
+            {/* Divider */}
+            <div style={{
+              height: '1px',
+              background: theme === 'dark'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+              margin: '0.5rem 0',
+            }} />
+
+            {/* Theme Toggle */}
+            <motion.div
+              whileHover={{ x: 5 }}
+              onClick={toggleTheme}
+              style={{
+                padding: '0.75rem 1rem',
+                cursor: 'pointer',
+                borderRadius: '0.5rem',
+                transition: 'background 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                color: theme === 'dark' ? '#fff' : '#1a1a1a',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = theme === 'dark'
+                  ? 'rgba(59, 130, 246, 0.2)'
+                  : 'rgba(59, 130, 246, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>{theme === 'dark' ? '🌙' : '☀️'}</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>
+                  {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                </span>
+              </div>
+              {/* Toggle Switch */}
+              <div style={{
+                width: '48px',
+                height: '24px',
+                borderRadius: '9999px',
+                background: theme === 'dark'
+                  ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
+                  : '#666',
+                position: 'relative',
+                transition: 'all 0.3s ease',
+              }}>
+                <motion.div
+                  animate={{ x: theme === 'dark' ? 24 : 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    background: '#fff',
+                    position: 'absolute',
+                    top: '2px',
+                    left: '2px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                  }}
+                />
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -175,43 +242,7 @@ const HamburgerMenu = ({ theme }: { theme: Theme }) => {
   );
 };
 
-// Theme Toggle Button Component
-const ThemeToggle = ({ theme, toggleTheme }: { theme: Theme; toggleTheme: () => void }) => {
-  const { isAuthenticated } = useAuth();
-  
-  return (
-    <motion.button
-      onClick={toggleTheme}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      style={{
-        position: 'fixed',
-        top: '2rem',
-        right: isAuthenticated ? '22rem' : '2rem', // Adjust position when logged in
-        width: '50px',
-        height: '50px',
-        borderRadius: '50%',
-        background: theme === 'dark'
-          ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
-          : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
-        border: 'none',
-        cursor: 'pointer',
-        zIndex: 100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: theme === 'dark'
-          ? '0 0 20px rgba(59, 130, 246, 0.4)'
-          : '0 0 20px rgba(251, 191, 36, 0.4)',
-        transition: 'all 0.3s ease',
-      }}
-    >
-      <span style={{ fontSize: '1.5rem' }}>
-        {theme === 'dark' ? '☀️' : '🌙'}
-      </span>
-    </motion.button>
-  );
-};
+
 
 // Three.js Particle Field Component
 const ParticleField = () => {
@@ -224,12 +255,32 @@ const ParticleField = () => {
 };
 
 // Navigation Bar Component
-const NavigationBar = ({ showNav, theme }: { showNav: boolean; theme: Theme }) => {
+const NavigationBar = ({ showNav, theme, lenisRef }: { showNav: boolean; theme: Theme; lenisRef: React.RefObject<Lenis | null> }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Traffic Map', path: '/mapview' },
+    { name: 'Assistant', path: '/assistant' },
     { name: 'About', path: '/about' },
   ];
+
+  const handleHomeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (location.pathname === '/') {
+      // Already on home page, just scroll to top
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(0, { immediate: true, duration: 0 });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    } else {
+      // Navigate to home page (scroll reset will happen via useEffect in App)
+      navigate('/');
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -303,7 +354,47 @@ const NavigationBar = ({ showNav, theme }: { showNav: boolean; theme: Theme }) =
             >
               {navLinks.map((link, index) => (
                 <motion.li key={link.name}>
-                  <Link to={link.path}>
+                  {link.name === 'Home' ? (
+                    <a href="/" onClick={handleHomeClick} style={{ textDecoration: 'none' }}>
+                      <motion.span
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 * index, duration: 0.5 }}
+                        whileHover={{
+                          scale: 1.8,
+                          color: '#3b82f6',
+                          transition: { duration: 0.25 },
+                        }}
+                        style={{
+                          fontSize: '1rem',
+                          fontWeight: 600,
+                          color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
+                        letterSpacing: '0.05em',
+                        textDecoration: 'none',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        position: 'relative',
+                        display: 'inline-block',
+                      }}
+                    >
+                      {link.name}
+                      {/* Underline animation */}
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileHover={{ width: '100%' }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                          position: 'absolute',
+                          bottom: -4,
+                          left: 0,
+                          height: '2px',
+                          background: 'linear-gradient(90deg, #0ea5e9, #3b82f6, #6366f1)',
+                        }}
+                      />
+                    </motion.span>
+                  </a>
+                  ) : (
+                  <Link to={link.path} style={{ textDecoration: 'none' }}>
                     <motion.span
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -341,6 +432,7 @@ const NavigationBar = ({ showNav, theme }: { showNav: boolean; theme: Theme }) =
                       />
                     </motion.span>
                   </Link>
+                  )}
                 </motion.li>
               ))}
             </ul>
@@ -605,6 +697,15 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
   const navigate = useNavigate();
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
+  // Debug: Log user state changes
+  useEffect(() => {
+    console.log('App.tsx - Current user state:', user);
+    if (user) {
+      console.log('User fullName:', user?.fullName);
+      console.log('User email:', user?.email);
+    }
+  }, [user]);
+
   // Initialize Google Sign-In
   useEffect(() => {
     const initGoogle = () => {
@@ -824,7 +925,7 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
               transition: 'color 0.5s ease',
             }}
           >
-            {user ? `Welcome, ${user.fullName || user.email}!` : 'Welcome Back'}
+            {user ? `Welcome, ${user?.fullName || user?.email || 'Guest'}!` : 'Welcome Back'}
           </motion.h2>
 
           {/* Show user info if logged in */}
@@ -845,9 +946,9 @@ const LoginSection = ({ theme }: { theme: Theme }) => {
                 color: theme === 'dark' ? '#a0a0a0' : '#666',
                 marginBottom: '1rem'
               }}>
-                You are signed in as {user.email}
+                You are signed in as {user?.email || 'Unknown'}
               </p>
-              {user.profilePicture && (
+              {user?.profilePicture && (
                 <img
                   src={user.profilePicture}
                   alt="Profile"
@@ -1157,6 +1258,7 @@ function App() {
   const [showNav, setShowNav] = useState(true);
   const { theme, toggleTheme } = useTheme(); // Use theme from context
   const lenisRef = useRef<Lenis | null>(null);
+  const location = useLocation();
 
   // Remove local theme state management - it's now in context
   useEffect(() => {
@@ -1182,6 +1284,15 @@ function App() {
     };
   }, []);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true, duration: 0 });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
   // Handle hash-based navigation (e.g., /#login from protected routes)
   useEffect(() => {
     const hash = window.location.hash;
@@ -1201,7 +1312,8 @@ function App() {
   // Handle nav visibility based on scroll
   useEffect(() => {
     const handleScroll = () => {
-      setShowNav(window.scrollY < 50);
+      // Show navbar when at top OR when scrolled down past hero section
+      setShowNav(window.scrollY < 100 || window.scrollY > window.innerHeight * 0.5);
     };
 
     handleScroll(); // Initialize
@@ -1229,10 +1341,9 @@ function App() {
       background: theme === 'dark' ? '#000' : '#fff',
       transition: 'background 0.5s ease'
     }}>
-      <HamburgerMenu theme={theme} />
+      <HamburgerMenu theme={theme} toggleTheme={toggleTheme} />
       <LogoutButton />
-      <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-      <NavigationBar showNav={showNav} theme={theme} />
+      <NavigationBar showNav={showNav} theme={theme} lenisRef={lenisRef} />
       <Hero onExploreClick={handleExploreClick} theme={theme} />
       {/* Spacer to enable scrolling through zoom effect */}
       <div style={{ height: '100vh' }} />

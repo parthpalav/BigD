@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-import { useAuth } from '../hooks/useAuth';
 import LogoutButton from '../components/LogoutButton';
 import { CityScene } from '../components/about/CityScene';
 import { TrafficFlow } from '../components/about/TrafficFlow';
@@ -11,10 +10,16 @@ import { SceneController } from '../components/about/SceneController';
 import { ScrollSections } from '../components/about/ScrollSections';
 
 const About: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [focusMode, setFocusMode] = useState<'commercial' | 'private' | 'intelligence' | 'default'>('default');
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Traffic Map', path: '/mapview' },
+    { name: 'Assistant', path: '/assistant' },
+    { name: 'About', path: '/about' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,63 +84,89 @@ const About: React.FC = () => {
       {/* Logout Button */}
       <LogoutButton />
 
-      {/* Theme Toggle */}
-      <motion.button
-        onClick={toggleTheme}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        style={{
-          position: 'fixed',
-          top: '2rem',
-          right: isAuthenticated ? '22rem' : '2rem',
-          width: '50px',
-          height: '50px',
-          borderRadius: '50%',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
-            : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
-          border: 'none',
-          cursor: 'pointer',
-          zIndex: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: theme === 'dark'
-            ? '0 0 20px rgba(59, 130, 246, 0.4)'
-            : '0 0 20px rgba(251, 191, 36, 0.4)',
-          transition: 'all 0.3s ease',
-        }}
-      >
-        <span style={{ fontSize: '1.5rem' }}>
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </span>
-      </motion.button>
-
-      {/* Back Button */}
-      <Link to="/">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+      {/* Navigation Bar */}
+      <AnimatePresence>
+        <motion.nav
+          initial={{ opacity: 0, y: -100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -100 }}
+          transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
           style={{
             position: 'fixed',
-            top: '2rem',
-            left: '2rem',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '0.5rem',
-            background: theme === 'dark'
-              ? 'rgba(59, 130, 246, 0.8)'
-              : 'rgba(59, 130, 246, 0.9)',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-            zIndex: 100,
-            fontWeight: 600,
-            backdropFilter: 'blur(10px)',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 50,
+            padding: '2rem 2rem',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
-          ← Back to Home
-        </motion.button>
-      </Link>
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: theme === 'dark' ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+              zIndex: -1,
+              transition: 'background 0.3s ease',
+            }}
+          />
+
+          <div
+            style={{
+              maxWidth: '1400px',
+              margin: '0 auto',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <ul
+              style={{
+                display: 'flex',
+                gap: '3rem',
+                listStyle: 'none',
+                margin: 0,
+                padding: 0,
+              }}
+            >
+              {navLinks.map((link, index) => (
+                <motion.li
+                  key={link.path}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                >
+                  <Link
+                    to={link.path}
+                    style={{
+                      color: theme === 'dark' ? '#e5e5e5' : '#1a1a1a',
+                      textDecoration: 'none',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      position: 'relative',
+                      padding: '0.5rem 0',
+                      transition: 'color 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#3b82f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = theme === 'dark' ? '#e5e5e5' : '#1a1a1a';
+                    }}
+                  >
+                    {link.name}
+                  </Link>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+        </motion.nav>
+      </AnimatePresence>
 
       {/* Scroll Sections Overlay */}
       <div style={{ position: 'relative', zIndex: 10 }}>

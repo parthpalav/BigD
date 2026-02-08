@@ -47,7 +47,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (token) {
         try {
           const response = await axios.get(`${API_URL}/auth/me`);
-          setUser(response.data.data);
+          console.log('Loaded user data:', response.data.data);
+          setUser(response.data.data.user);
         } catch (error) {
           console.error('Failed to load user:', error);
           // Token might be expired
@@ -66,6 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const response = await axios.post(`${API_URL}/auth/login`, { email, password });
       const { user: userData, token: authToken } = response.data.data;
       
+      console.log('Login successful - User data:', userData);
       localStorage.setItem('token', authToken);
       setToken(authToken);
       setUser(userData);
@@ -84,6 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
       const { user: userData, token: authToken } = response.data.data;
       
+      console.log('Registration successful - User data:', userData);
       localStorage.setItem('token', authToken);
       setToken(authToken);
       setUser(userData);
@@ -108,6 +111,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       const { user: userData, token: authToken } = response.data.data;
       
+      console.log('Google login - User data:', userData);
       localStorage.setItem('token', authToken);
       setToken(authToken);
       setUser(userData);
@@ -134,7 +138,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (token) {
       try {
         const response = await axios.get(`${API_URL}/auth/me`);
-        setUser(response.data.data);
+        console.log('Refreshed user data:', response.data.data);
+        setUser(response.data.data.user);
       } catch (error) {
         console.error('Failed to refresh user:', error);
       }

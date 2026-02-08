@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import LogoutButton from '../components/LogoutButton';
+import { useTheme } from '../hooks/useTheme';
 import MapContainer from '../components/map/MapContainer';
 import InputPanel from '../components/map/InputPanel';
 import InsightsPanel from '../components/map/InsightsPanel';
@@ -22,10 +22,8 @@ import {
 import { saveSearch } from '../services/searchHistoryService';
 import type { SearchHistoryItem } from '../services/searchHistoryService';
 
-type Theme = 'light' | 'dark';
-
 const MapView: React.FC = () => {
-    const [theme, setTheme] = useState<Theme>('dark');
+    const { theme } = useTheme();
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -38,10 +36,6 @@ const MapView: React.FC = () => {
     const [currentHour, setCurrentHour] = useState(new Date().getHours());
     const [selectedRouteType, setSelectedRouteType] = useState<'best' | 'fuel-efficient'>('best');
     const [showHistory, setShowHistory] = useState(true);
-
-    const toggleTheme = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-    };
 
     const handlePredictionSubmit = async (data: {
         source: Location;
@@ -313,39 +307,6 @@ const MapView: React.FC = () => {
                             History
                         </motion.button>
                     )}
-
-                    {/* Theme Toggle */}
-                    <motion.button
-                        onClick={toggleTheme}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        style={{
-                            padding: '0.5rem 1rem',
-                            borderRadius: '2rem',
-                            background: theme === 'dark'
-                                ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
-                                : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
-                            border: 'none',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            boxShadow: theme === 'dark'
-                                ? '0 4px 12px rgba(59, 130, 246, 0.3)'
-                                : '0 4px 12px rgba(251, 191, 36, 0.3)',
-                            transition: 'all 0.3s ease',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                        }}
-                    >
-                        {theme === 'dark' ? 'Light' : 'Dark'}
-                    </motion.button>
-
-                    {/* Logout Button */}
-                    <LogoutButton />
                 </div>
             </div>
 

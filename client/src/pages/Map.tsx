@@ -32,38 +32,6 @@ const Map: React.FC = () => {
       {/* Logout Button */}
       <LogoutButton />
 
-      {/* Theme Toggle */}
-      <motion.button
-        onClick={toggleTheme}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        style={{
-          position: 'fixed',
-          top: '2rem',
-          right: isAuthenticated ? '22rem' : '2rem',
-          width: '50px',
-          height: '50px',
-          borderRadius: '50%',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%)'
-            : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%)',
-          border: 'none',
-          cursor: 'pointer',
-          zIndex: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: theme === 'dark'
-            ? '0 0 20px rgba(59, 130, 246, 0.4)'
-            : '0 0 20px rgba(251, 191, 36, 0.4)',
-          transition: 'all 0.3s ease',
-        }}
-      >
-        <span style={{ fontSize: '1.5rem' }}>
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </span>
-      </motion.button>
-
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 10, padding: '2rem' }}>
         <motion.div

@@ -31,6 +31,10 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className, style }) 
       transition={{ duration: 0.3 }}
       className={className}
       style={{
+        position: 'fixed',
+        top: '2rem',
+        right: '2rem',
+        zIndex: 100,
         display: 'flex',
         alignItems: 'center',
         ...style,
