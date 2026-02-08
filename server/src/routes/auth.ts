@@ -2,8 +2,12 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 
 const router = Router();
+
+// Initialize Google OAuth client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Validation middleware
 const signupValidation = [
@@ -198,6 +202,82 @@ router.post('/login', loginValidation, async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'Server error during login',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * @route   POST /api/auth/google
+ * @desc    Authenticate user with Google OAuth
+ * @access  Public
+ */
+router.post('/google', async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google credential is required'
+      });
+    }
+
+    // Verify the Google token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Google credential'
+      });
+    }
+
+    const { email, name, picture } = payload;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user with Google account
+      user = new User({
+        name: name || email.split('@')[0],
+        email,
+        password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8), // Random password for Google users
+        googleId: payload.sub
+      });
+      await user.save();
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key-change-this',
+      { expiresIn: '7d' }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Google login successful',
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          createdAt: user.createdAt
+        },
+        token
+      }
+    });
+  } catch (error: any) {
+    console.error('Google OAuth error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during Google authentication',
       error: error.message
     });
   }
