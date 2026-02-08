@@ -12,6 +12,7 @@ interface NewsArticle {
   source: string;
   category: 'Traffic' | 'Accident' | 'Construction' | 'Transit' | 'Weather' | 'Other';
   timestamp: string;
+  url: string;
 }
 
 const News: React.FC = () => {
@@ -458,7 +459,7 @@ const News: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
-                  whileHover={{ y: -4, borderColor: '#3b82f6' }}
+                  whileHover={{ y: -4 }}
                   style={{
                     background: theme === 'dark' ? '#141414' : '#ffffff',
                     border: theme === 'dark' 
@@ -467,7 +468,6 @@ const News: React.FC = () => {
                     borderRadius: '1rem',
                     padding: '1.5rem',
                     transition: 'all 0.3s ease',
-                    cursor: 'pointer',
                     boxShadow: theme === 'dark' 
                       ? 'none' 
                       : '0 1px 3px rgba(0, 0, 0, 0.05)',
@@ -538,7 +538,6 @@ const News: React.FC = () => {
                       fontWeight: 400,
                       color: theme === 'dark' ? '#a0a0a0' : '#666666',
                       lineHeight: 1.6,
-                      marginBottom: '1rem',
                       display: '-webkit-box',
                       WebkitLineClamp: 4,
                       WebkitBoxOrient: 'vertical',
@@ -547,22 +546,6 @@ const News: React.FC = () => {
                   >
                     {article.summary}
                   </p>
-
-                  {/* Read More Link */}
-                  <motion.span
-                    whileHover={{ x: 5 }}
-                    style={{
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
-                      color: '#3b82f6',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                    }}
-                  >
-                    Read more →
-                  </motion.span>
                 </motion.div>
               ))}
             </motion.div>

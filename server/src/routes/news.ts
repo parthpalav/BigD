@@ -13,6 +13,7 @@ interface NewsArticle {
   source: string;
   category: 'Traffic' | 'Accident' | 'Construction' | 'Transit' | 'Weather' | 'Other';
   timestamp: string;
+  url: string;
 }
 
 /**
@@ -62,8 +63,13 @@ For each news item, provide:
 3. Source (realistic Mumbai news sources like Times of India, Mumbai Mirror, Mid-Day, or Local Reports)
 4. Category (one of: Traffic, Accident, Construction, Transit, Weather, Other)
 5. Timestamp (use "2 hours ago", "This morning", "Yesterday", or specific times)
+6. URL (use the source's Mumbai homepage based on the source:
+   - Times of India: https://timesofindia.indiatimes.com/city/mumbai
+   - Mumbai Mirror: https://mumbaimirror.indiatimes.com/mumbai
+   - Mid-Day: https://www.mid-day.com/mumbai
+   - Local Reports/Traffic Police: https://mumbaitraffic.police.gov.in/)
 
-Format your response as a JSON array with objects containing exactly these fields: headline, summary, source, category, timestamp.
+Format your response as a JSON array with objects containing exactly these fields: headline, summary, source, category, timestamp, url.
 
 Provide 10-12 realistic news items relevant to Mumbai's current traffic and transportation situation. Make them varied and informative.
 
@@ -103,70 +109,80 @@ IMPORTANT: Return ONLY the JSON array, no other text or explanation.`;
           summary: 'Commuters are experiencing significant delays on the Western Express Highway due to increased volume during peak hours. Travel time has increased by approximately 30 minutes.',
           source: 'Times of India',
           category: 'Traffic',
-          timestamp: '2 hours ago'
+          timestamp: '2 hours ago',
+          url: 'https://timesofindia.indiatimes.com/city/mumbai'
         },
         {
           headline: 'Bandra-Worli Sea Link Maintenance Work',
           summary: 'One lane of the Bandra-Worli Sea Link will be closed for routine maintenance tonight from 11 PM to 6 AM. Motorists are advised to plan alternative routes.',
           source: 'Mumbai Mirror',
           category: 'Construction',
-          timestamp: 'This morning'
+          timestamp: 'This morning',
+          url: 'https://mumbaimirror.indiatimes.com/mumbai'
         },
         {
           headline: 'Eastern Freeway Running Smoothly',
           summary: 'Traffic flow on the Eastern Freeway is smooth with no major congestion reported. Good conditions for commuters heading towards South Mumbai.',
           source: 'Local Reports',
           category: 'Traffic',
-          timestamp: '1 hour ago'
+          timestamp: '1 hour ago',
+          url: 'https://mumbaitraffic.police.gov.in/'
         },
         {
           headline: 'Mumbai Metro Line 3 Update',
           summary: 'Construction work for Mumbai Metro Line 3 continues on schedule. Partial service expected to begin by end of year with stations from Colaba to Santacruz.',
           source: 'Mid-Day',
           category: 'Transit',
-          timestamp: 'Yesterday'
+          timestamp: 'Yesterday',
+          url: 'https://www.mid-day.com/mumbai'
         },
         {
           headline: 'Monsoon Preparedness: Roads Being Repaired',
           summary: 'BMC has initiated pre-monsoon road repairs across the city. Focus on pothole filling and drainage clearing to prevent waterlogging during upcoming rainy season.',
           source: 'Mumbai Mirror',
           category: 'Construction',
-          timestamp: '5 hours ago'
+          timestamp: '5 hours ago',
+          url: 'https://mumbaimirror.indiatimes.com/mumbai'
         },
         {
           headline: 'Coastal Road Project Progress',
           summary: 'The Mumbai Coastal Road project has completed 70% of construction. The new 10.58 km stretch will significantly reduce travel time between South Mumbai and suburbs.',
           source: 'Times of India',
           category: 'Construction',
-          timestamp: 'This morning'
+          timestamp: 'This morning',
+          url: 'https://timesofindia.indiatimes.com/city/mumbai'
         },
         {
           headline: 'Traffic Advisory for Marathon Event',
           summary: 'Multiple roads in South Mumbai will be closed tomorrow from 6 AM to 12 PM for the annual marathon event. Commuters advised to use Eastern Freeway as alternative.',
           source: 'Traffic Police Mumbai',
           category: 'Traffic',
-          timestamp: '3 hours ago'
+          timestamp: '3 hours ago',
+          url: 'https://mumbaitraffic.police.gov.in/'
         },
         {
           headline: 'Andheri Subway Closed for Repairs',
           summary: 'The Andheri East subway near railway station will be closed for emergency repairs tonight. Traffic will be diverted via alternative routes.',
           source: 'Local Reports',
           category: 'Construction',
-          timestamp: '1 hour ago'
+          timestamp: '1 hour ago',
+          url: 'https://mumbaitraffic.police.gov.in/'
         },
         {
           headline: 'Late Night Traffic Thin on Highways',
           summary: 'Traffic conditions are excellent on all major highways during late night hours. Perfect time for long-distance commuters and delivery services.',
           source: 'Local Reports',
           category: 'Traffic',
-          timestamp: '30 minutes ago'
+          timestamp: '30 minutes ago',
+          url: 'https://mumbaitraffic.police.gov.in/'
         },
         {
           headline: 'New Signal System at Worli Junction',
           summary: 'Smart traffic signals have been installed at Worli Junction to optimize traffic flow. System uses AI to adapt timing based on real-time congestion levels.',
           source: 'Mid-Day',
           category: 'Other',
-          timestamp: '4 hours ago'
+          timestamp: '4 hours ago',
+          url: 'https://www.mid-day.com/mumbai'
         }
       ] as NewsArticle[];
       
@@ -204,14 +220,17 @@ IMPORTANT: Return ONLY the JSON array, no other text or explanation.`;
         throw new Error('Response is not an array');
       }
       
-      // Validate article structure
+      // Validate article structure and add default URL if missing
       articles = articles.filter(article => 
         article.headline && 
         article.summary && 
         article.source && 
         article.category && 
         article.timestamp
-      );
+      ).map(article => ({
+        ...article,
+        url: article.url || 'https://timesofindia.indiatimes.com/city/mumbai'
+      }));
       
     } catch (parseError) {
       console.error('❌ Failed to parse AI response:', parseError);
@@ -224,21 +243,24 @@ IMPORTANT: Return ONLY the JSON array, no other text or explanation.`;
           summary: 'Commuters are experiencing significant delays on the Western Express Highway due to increased volume during peak hours. Travel time has increased by approximately 30 minutes.',
           source: 'Times of India',
           category: 'Traffic',
-          timestamp: '2 hours ago'
+          timestamp: '2 hours ago',
+          url: 'https://timesofindia.indiatimes.com/city/mumbai'
         },
         {
           headline: 'Bandra-Worli Sea Link Maintenance Work',
           summary: 'One lane of the Bandra-Worli Sea Link will be closed for routine maintenance tonight from 11 PM to 6 AM. Motorists are advised to plan alternative routes.',
           source: 'Mumbai Mirror',
           category: 'Construction',
-          timestamp: 'This morning'
+          timestamp: 'This morning',
+          url: 'https://mumbaimirror.indiatimes.com/mumbai'
         },
         {
           headline: 'Eastern Freeway Running Smoothly',
           summary: 'Traffic flow on the Eastern Freeway is smooth with no major congestion reported. Good conditions for commuters heading towards South Mumbai.',
           source: 'Local Reports',
           category: 'Traffic',
-          timestamp: '1 hour ago'
+          timestamp: '1 hour ago',
+          url: 'https://mumbaitraffic.police.gov.in/'
         }
       ];
     }
